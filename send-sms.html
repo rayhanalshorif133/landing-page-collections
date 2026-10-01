@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send SMS - SMS Route BD</title>
+
+  <!-- Exact Fonts from font-demo.png: DM Sans & Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"DM Sans"', 'Arial', 'sans-serif'],
+            manrope: ['Manrope', '"DM Sans"', 'sans-serif'],
+            georgia: ['Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef6ff',
+              100: '#d9eaff',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f9fafb] text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-700">
+
+  <!-- Mobile Overlay Backdrop -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
+  <!-- Mobile Top Header Bar -->
+  <header class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <button id="open-sidebar-btn" type="button" aria-label="Open Sidebar" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="radio" class="w-5 h-5"></i>
+        </div>
+        <div class="leading-none">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-base text-slate-900 tracking-tight">SMS Route</span>
+            <span class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded leading-tight">BD</span>
+          </div>
+          <span class="text-[8px] uppercase tracking-wider text-slate-400 font-medium">Connect · Route · Deliver</span>
+        </div>
+      </a>
+    </div>
+
+    <a href="buy-credits.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/60 text-amber-800 text-xs font-semibold hover:bg-amber-100 transition-colors">
+      <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-600"></i>
+      <span>3 credits</span>
+    </a>
+  </header>
+
+  <div class="flex flex-1 min-h-screen">
+    <!-- Sidebar Navigation -->
+    <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 lg:z-10 h-screen w-72 lg:w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between p-4 -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between pb-1">
+          <a href="index.html" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-700 flex items-center justify-center text-white shadow-sm transition-colors">
+              <i data-lucide="radio" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 leading-none">
+                <span class="font-bold text-lg text-slate-900 tracking-tight">SMS Route</span>
+                <span class="bg-blue-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded leading-tight">BD</span>
+              </div>
+              <p class="text-[9px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">CONNECT · ROUTE · DELIVER</p>
+            </div>
+          </a>
+          <button id="close-sidebar-btn" type="button" aria-label="Close Sidebar" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <a href="buy-credits.html" class="flex items-center justify-between px-3.5 py-2.5 bg-amber-50/70 border border-amber-200/70 rounded-2xl hover:bg-amber-100/70 transition-all group">
+          <div class="flex items-center gap-2 text-slate-700 text-sm font-medium">
+            <i data-lucide="coins" class="w-4 h-4 text-amber-600 group-hover:rotate-12 transition-transform"></i>
+            <span>Balance</span>
+          </div>
+          <span class="text-sm font-bold text-slate-900">3 credits</span>
+        </a>
+
+        <nav class="space-y-1 pt-1 font-medium text-sm">
+          <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-slate-500"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="send-sms.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-semibold transition-colors">
+            <i data-lucide="send" class="w-4 h-4 text-blue-600"></i>
+            <span>Send SMS</span>
+          </a>
+          <a href="buy-credits.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="shopping-cart" class="w-4 h-4 text-slate-500"></i>
+            <span>Buy Credits</span>
+          </a>
+          <a href="history.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
+            <span>History</span>
+          </a>
+          <a href="referrals.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="gift" class="w-4 h-4 text-slate-500"></i>
+            <span>Referrals</span>
+          </a>
+          <a href="redeem-coupon.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="ticket" class="w-4 h-4 text-slate-500"></i>
+            <span>Redeem Coupon</span>
+          </a>
+          <a href="settings.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
+            <span>Settings</span>
+          </a>
+          <a href="api-keys.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="key" class="w-4 h-4 text-slate-500"></i>
+            <span>API Keys</span>
+          </a>
+          <a href="api-guide.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4 text-slate-500"></i>
+            <span>API Guide</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="pt-6 space-y-3">
+        <div class="p-3 bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+          <p class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">SIGNED IN</p>
+          <p class="text-xs font-semibold text-slate-800 truncate mt-0.5" title="rayhan.b2m.tech@gmail.com">rayhan.b2m.tech@gmail.com</p>
+        </div>
+        <a href="login.html" class="flex items-center gap-2.5 px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-red-600 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>Sign out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area (Centered on Large Devices) -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-10 flex justify-center">
+      <div class="w-full max-w-5xl xl:max-w-6xl">
+      <!-- Breadcrumb & Header -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
+          <a href="index.html" class="hover:text-blue-600 transition-colors">Dashboard</a>
+          <span>/</span>
+          <span class="text-slate-700">Send SMS</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-serif-title font-bold text-slate-900">Campaign & SMS Dispatcher</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Compose single messages or dispatch large-scale bulk SMS with dynamic variables.</p>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="flex border-b border-slate-200 mb-6 gap-6 text-sm font-semibold">
+        <button id="tab-single" onclick="switchMode('single')" class="pb-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-2 transition-all">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Single SMS</span>
+        </button>
+        <button id="tab-bulk" onclick="switchMode('bulk')" class="pb-3 text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition-all">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Bulk SMS (CSV / List)</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- SMS Composer Form (7 Cols) -->
+        <div class="lg:col-span-7 space-y-5">
+          <form id="sms-form" onsubmit="handleSendSMS(event)" class="custom-card p-6 bg-white space-y-4">
+            
+            <!-- Sender ID / Route -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">Sender ID / Masking</label>
+                <select class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                  <option value="non-masking">Non-Masking (019XXXXXXXX)</option>
+                  <option value="SMS_ROUTE">SMS ROUTE BD (Approved Mask)</option>
+                  <option value="B2M_TECH">B2M TECH (Approved Mask)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1.5">SMS Route Type</label>
+                <select class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none">
+                  <option value="promotional">Promotional (High Speed)</option>
+                  <option value="transactional">Transactional (Instant OTP 24/7)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Single Recipient Input -->
+            <div id="single-recipient-group">
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-700">Recipient Phone Number</label>
+                <span class="text-[11px] text-slate-400">e.g. 018XXXXXXXX or +88018XXXXXXXX</span>
+              </div>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="phone" class="w-4 h-4"></i>
+                </div>
+                <input 
+                  type="text" 
+                  id="target-recipient"
+                  data-recipient-counter
+                  placeholder="01923988380" 
+                  class="w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                >
+              </div>
+            </div>
+
+            <!-- Bulk Recipient Input (Hidden by default) -->
+            <div id="bulk-recipient-group" class="hidden space-y-3">
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-semibold text-slate-700">Recipient Numbers (Comma or Newline separated)</label>
+                <label class="text-xs text-blue-600 hover:underline cursor-pointer flex items-center gap-1 font-medium">
+                  <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                  <span>Upload CSV/Excel</span>
+                  <input type="file" accept=".csv,.txt,.xlsx" class="hidden" onchange="handleCsvUpload(event)">
+                </label>
+              </div>
+              <textarea 
+                id="bulk-recipients"
+                data-recipient-counter
+                rows="4" 
+                placeholder="01923988380&#10;01712345678&#10;01898765432"
+                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 resize-none font-mono text-xs"
+              ></textarea>
+              <p class="text-[11px] text-slate-400">Duplicates and invalid BD phone numbers are automatically cleaned upon submission.</p>
+            </div>
+
+            <!-- Quick Templates & Insert Variables -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-xs font-semibold text-slate-700">Message Content</label>
+                <div class="flex items-center gap-2">
+                  <select id="template-select" onchange="applyTemplate(this.value)" class="text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded-lg border-0 outline-none cursor-pointer">
+                    <option value="">Insert template...</option>
+                    <option value="Dear customer, your OTP for SMS Route verification is 849201. Valid for 5 minutes.">OTP Verification</option>
+                    <option value="Exclusive Offer! Get 20% discount on all purchases today with code FLASH20. Shop now!">Promotional Offer</option>
+                    <option value="Your order #10842 has been dispatched and will arrive within 48 hours. Thank you!">Order Shipped</option>
+                  </select>
+                </div>
+              </div>
+
+              <textarea 
+                id="main-sms-text"
+                data-char-counter="#sms-char-counter"
+                rows="5" 
+                placeholder="Type your SMS message here in English or বাংলা..."
+                class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 resize-none"
+              ></textarea>
+
+              <div class="flex flex-wrap items-center justify-between pt-2 text-xs text-slate-500 gap-2">
+                <span id="sms-char-counter" class="font-medium text-slate-600">0 / 1224 chars · 0 credits</span>
+                <span class="text-[11px] text-slate-400">Standard: 160 chars/SMS | Unicode: 70 chars/SMS</span>
+              </div>
+            </div>
+
+            <!-- Schedule Dispatch Option -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+              <label class="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700">
+                <input type="checkbox" id="schedule-checkbox" onchange="toggleSchedule(this.checked)" class="rounded text-blue-600 focus:ring-blue-500 border-slate-300">
+                <span>Schedule send for later</span>
+              </label>
+
+              <div id="schedule-input-wrapper" class="hidden">
+                <input type="datetime-local" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 outline-none">
+              </div>
+            </div>
+
+            <!-- Submit Button & Cost Preview -->
+            <div class="pt-4 flex items-center justify-between gap-4">
+              <div class="text-xs text-slate-500">
+                Current Balance: <strong class="text-slate-900">3 credits</strong>
+              </div>
+              <button 
+                type="submit" 
+                class="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-blue-500/20 transition-all active:scale-[0.98]"
+              >
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span id="submit-btn-text">Send Message Now</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live Smartphone Preview (5 Cols) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="custom-card p-5 bg-white">
+            <h3 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
+              <i data-lucide="smartphone" class="w-4 h-4 text-blue-600"></i>
+              <span>Live Recipient Preview</span>
+            </h3>
+
+            <!-- Phone Mockup Container -->
+            <div class="mx-auto max-w-[280px] bg-slate-900 rounded-[2.5rem] p-3 shadow-2xl border-4 border-slate-800">
+              <!-- Speaker & Camera notch -->
+              <div class="w-20 h-4 bg-slate-800 rounded-full mx-auto mb-2"></div>
+              
+              <!-- Screen -->
+              <div class="bg-slate-100 rounded-[2rem] p-3 min-h-[380px] flex flex-col justify-between text-xs">
+                <!-- Chat Header -->
+                <div class="text-center border-b border-slate-200 pb-2">
+                  <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mx-auto text-[11px] mb-1">
+                    SR
+                  </div>
+                  <div class="font-bold text-slate-800">SMS Route BD</div>
+                  <div class="text-[10px] text-slate-400">Today 10:24 AM</div>
+                </div>
+
+                <!-- Bubble -->
+                <div class="my-auto py-3">
+                  <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-tl-sm shadow-sm text-[12px] leading-relaxed break-words" id="phone-preview-bubble">
+                    Type your SMS message to see instant real-time recipient preview here.
+                  </div>
+                  <span class="text-[9px] text-slate-400 block text-right mt-1">Delivered</span>
+                </div>
+
+                <!-- Bottom input bar placeholder -->
+                <div class="bg-white rounded-full px-3 py-1.5 text-[10px] text-slate-400 flex items-center justify-between border border-slate-200">
+                  <span>Text Message</span>
+                  <i data-lucide="arrow-up" class="w-3.5 h-3.5 text-blue-500"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    lucide.createIcons();
+
+    // Mode Switcher
+    function switchMode(mode) {
+      const singleTab = document.getElementById('tab-single');
+      const bulkTab = document.getElementById('tab-bulk');
+      const singleGroup = document.getElementById('single-recipient-group');
+      const bulkGroup = document.getElementById('bulk-recipient-group');
+      const btnText = document.getElementById('submit-btn-text');
+
+      if (mode === 'single') {
+        singleTab.className = 'pb-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-2 transition-all';
+        bulkTab.className = 'pb-3 text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition-all';
+        singleGroup.classList.remove('hidden');
+        bulkGroup.classList.add('hidden');
+        btnText.textContent = 'Send Message Now';
+      } else {
+        bulkTab.className = 'pb-3 text-blue-600 border-b-2 border-blue-600 flex items-center gap-2 transition-all';
+        singleTab.className = 'pb-3 text-slate-500 hover:text-slate-800 border-b-2 border-transparent flex items-center gap-2 transition-all';
+        bulkGroup.classList.remove('hidden');
+        singleGroup.classList.add('hidden');
+        btnText.textContent = 'Start Bulk Dispatch';
+      }
+    }
+
+    // Toggle Schedule
+    function toggleSchedule(isChecked) {
+      const el = document.getElementById('schedule-input-wrapper');
+      if (isChecked) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
+
+    // Apply Template
+    function applyTemplate(text) {
+      if (!text) return;
+      const input = document.getElementById('main-sms-text');
+      input.value = text;
+      input.dispatchEvent(new Event('input'));
+    }
+
+    // Handle CSV upload
+    function handleCsvUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      showToast(`Loaded ${file.name} successfully! (142 contacts found)`, 'success');
+      document.getElementById('bulk-recipients').value = "01923988380\n01711223344\n01855667788\n01699887766";
+      document.getElementById('main-sms-text').dispatchEvent(new Event('input'));
+    }
+
+    // Live preview update
+    document.getElementById('main-sms-text').addEventListener('input', (e) => {
+      const preview = document.getElementById('phone-preview-bubble');
+      preview.textContent = e.target.value.trim() || 'Type your SMS message to see instant real-time recipient preview here.';
+    });
+
+    // Handle form submit with Anti-Abuse and Threat Detection
+    function handleSendSMS(event) {
+      event.preventDefault();
+      const input = document.getElementById('main-sms-text');
+      const msg = input.value.trim();
+
+      if (!msg) {
+        showToast('Please type a message before sending!', 'error');
+        return;
+      }
+
+      // Prohibited content / threat check
+      const violation = checkProhibitedContent(msg);
+      if (violation) {
+        handleAbuseViolation(input, violation);
+        return; // SMS will NOT be sent
+      }
+
+      showToast('SMS dispatched successfully to route! (1 SMS deducted)', 'success');
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+    }
+  </script>
+</body>
+</html>

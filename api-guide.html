@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Documentation & Guide - SMS Route BD</title>
+
+  <!-- Exact Fonts from font-demo.png: DM Sans & Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"DM Sans"', 'Arial', 'sans-serif'],
+            manrope: ['Manrope', '"DM Sans"', 'sans-serif'],
+            georgia: ['Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f9fafb] text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-700">
+
+  <!-- Mobile Overlay Backdrop -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
+  <!-- Mobile Header -->
+  <header class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <button id="open-sidebar-btn" type="button" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="radio" class="w-5 h-5"></i>
+        </div>
+        <div class="leading-none">
+          <div class="flex items-center gap-1">
+            <span class="font-bold text-base text-slate-900 tracking-tight">SMS Route</span>
+            <span class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded leading-tight">BD</span>
+          </div>
+          <span class="text-[8px] uppercase tracking-wider text-slate-400 font-medium">Connect · Route · Deliver</span>
+        </div>
+      </a>
+    </div>
+
+    <a href="buy-credits.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/60 text-amber-800 text-xs font-semibold">
+      <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-600"></i>
+      <span>3 credits</span>
+    </a>
+  </header>
+
+  <div class="flex flex-1 min-h-screen">
+    <!-- Sidebar Navigation -->
+    <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 lg:z-10 h-screen w-72 lg:w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between p-4 -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none overflow-y-auto">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between pb-1">
+          <a href="index.html" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-700 flex items-center justify-center text-white shadow-sm transition-colors">
+              <i data-lucide="radio" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 leading-none">
+                <span class="font-bold text-lg text-slate-900 tracking-tight">SMS Route</span>
+                <span class="bg-blue-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded leading-tight">BD</span>
+              </div>
+              <p class="text-[9px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5">CONNECT · ROUTE · DELIVER</p>
+            </div>
+          </a>
+          <button id="close-sidebar-btn" type="button" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <a href="buy-credits.html" class="flex items-center justify-between px-3.5 py-2.5 bg-amber-50/70 border border-amber-200/70 rounded-2xl hover:bg-amber-100/70 transition-all group">
+          <div class="flex items-center gap-2 text-slate-700 text-sm font-medium">
+            <i data-lucide="coins" class="w-4 h-4 text-amber-600 group-hover:rotate-12 transition-transform"></i>
+            <span>Balance</span>
+          </div>
+          <span class="text-sm font-bold text-slate-900">3 credits</span>
+        </a>
+
+        <nav class="space-y-1 pt-1 font-medium text-sm">
+          <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-slate-500"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="send-sms.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="send" class="w-4 h-4 text-slate-500"></i>
+            <span>Send SMS</span>
+          </a>
+          <a href="buy-credits.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="shopping-cart" class="w-4 h-4 text-slate-500"></i>
+            <span>Buy Credits</span>
+          </a>
+          <a href="history.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
+            <span>History</span>
+          </a>
+          <a href="referrals.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="gift" class="w-4 h-4 text-slate-500"></i>
+            <span>Referrals</span>
+          </a>
+          <a href="redeem-coupon.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="ticket" class="w-4 h-4 text-slate-500"></i>
+            <span>Redeem Coupon</span>
+          </a>
+          <a href="settings.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
+            <span>Settings</span>
+          </a>
+          <a href="api-keys.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="key" class="w-4 h-4 text-slate-500"></i>
+            <span>API Keys</span>
+          </a>
+          <!-- Active: API Guide -->
+          <a href="api-guide.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-semibold transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i>
+            <span>API Guide</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="pt-6 space-y-3">
+        <div class="p-3 bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+          <p class="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">SIGNED IN</p>
+          <p class="text-xs font-semibold text-slate-800 truncate mt-0.5">rayhan.b2m.tech@gmail.com</p>
+        </div>
+        <a href="login.html" class="flex items-center gap-2.5 px-2 py-1.5 text-xs font-medium text-slate-600 hover:text-red-600 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>Sign out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area (Centered on Large Devices) -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-10 flex justify-center">
+      <div class="w-full max-w-5xl xl:max-w-6xl">
+      <!-- Header -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
+          <a href="index.html" class="hover:text-blue-600 transition-colors">Dashboard</a>
+          <span>/</span>
+          <span class="text-slate-700">API Guide</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-serif-title font-bold text-slate-900">Developer Documentation & SDK</h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">Integrate SMS Route BD directly into your Laravel, Node.js, Python, or Django applications.</p>
+      </div>
+
+      <!-- Quickstart Base URL & Auth -->
+      <div class="custom-card p-6 bg-white mb-6 space-y-4">
+        <h2 class="font-bold text-base text-slate-900 flex items-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+          <span>Base URL & Authentication</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">Base API Endpoint</span>
+            <div class="font-mono font-bold text-slate-900 mt-1 text-sm select-all">https://api.smsroutebd.com/v1</div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">Authorization Header</span>
+            <div class="font-mono font-bold text-slate-900 mt-1 text-sm select-all">Authorization: Bearer YOUR_API_KEY</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Endpoint 1: Send Single SMS -->
+      <div class="custom-card p-6 bg-white mb-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-mono font-bold text-xs">POST</span>
+            <span class="font-mono text-sm font-semibold text-slate-800">/v1/sms/send</span>
+          </div>
+          <span class="text-xs text-slate-400">Dispatch Single SMS instantly</span>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Sends a high-priority message to any Bangladeshi phone number (supports numbers with or without <code>+88</code> country code).
+        </p>
+
+        <!-- Code Snippet Tabs -->
+        <div>
+          <div class="flex items-center gap-2 border-b border-slate-100 pb-2 text-xs font-semibold text-slate-500">
+            <button onclick="switchCodeTab('curl')" id="tab-btn-curl" class="px-3 py-1 rounded-lg bg-slate-900 text-white">cURL</button>
+            <button onclick="switchCodeTab('php')" id="tab-btn-php" class="px-3 py-1 rounded-lg hover:bg-slate-100">PHP (cURL)</button>
+            <button onclick="switchCodeTab('node')" id="tab-btn-node" class="px-3 py-1 rounded-lg hover:bg-slate-100">Node.js</button>
+            <button onclick="switchCodeTab('python')" id="tab-btn-python" class="px-3 py-1 rounded-lg hover:bg-slate-100">Python</button>
+          </div>
+
+          <!-- cURL Code Block -->
+          <div id="code-curl" class="code-tab-content mt-3 relative">
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed"><code>curl -X POST https://api.smsroutebd.com/v1/sms/send \
+  -H "Authorization: Bearer sms_live_9a7f34c2b8109d4e5f6a7b8c9d0e1f2a" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "recipient": "01923988380",
+    "message": "Your verification code is 492018",
+    "sender_id": "SMS ROUTE BD"
+  }'</code></pre>
+            <button data-copy-target="#code-curl pre code" class="absolute top-3 right-3 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Copy</button>
+          </div>
+
+          <!-- PHP Code Block -->
+          <div id="code-php" class="code-tab-content mt-3 relative hidden">
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed"><code>&lt;?php
+$ch = curl_init('https://api.smsroutebd.com/v1/sms/send');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer sms_live_9a7f34c2b8109d4e5f6a7b8c9d0e1f2a',
+    'Content-Type: application/json'
+]);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    'recipient' => '01923988380',
+    'message' => 'Your verification code is 492018',
+    'sender_id' => 'SMS ROUTE BD'
+]));
+
+$response = curl_exec($ch);
+curl_close($ch);
+echo $response;
+?&gt;</code></pre>
+            <button data-copy-target="#code-php pre code" class="absolute top-3 right-3 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Copy</button>
+          </div>
+
+          <!-- Node Code Block -->
+          <div id="code-node" class="code-tab-content mt-3 relative hidden">
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed"><code>const response = await fetch('https://api.smsroutebd.com/v1/sms/send', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer sms_live_9a7f34c2b8109d4e5f6a7b8c9d0e1f2a',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    recipient: '01923988380',
+    message: 'Your verification code is 492018',
+    sender_id: 'SMS ROUTE BD'
+  })
+});
+
+const data = await response.json();
+console.log(data);</code></pre>
+            <button data-copy-target="#code-node pre code" class="absolute top-3 right-3 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Copy</button>
+          </div>
+
+          <!-- Python Code Block -->
+          <div id="code-python" class="code-tab-content mt-3 relative hidden">
+            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto leading-relaxed"><code>import requests
+
+url = "https://api.smsroutebd.com/v1/sms/send"
+headers = {
+    "Authorization": "Bearer sms_live_9a7f34c2b8109d4e5f6a7b8c9d0e1f2a",
+    "Content-Type": "application/json"
+}
+payload = {
+    "recipient": "01923988380",
+    "message": "Your verification code is 492018",
+    "sender_id": "SMS ROUTE BD"
+}
+
+response = requests.post(url, json=payload, headers=headers)
+print(response.json())</code></pre>
+            <button data-copy-target="#code-python pre code" class="absolute top-3 right-3 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg">Copy</button>
+          </div>
+        </div>
+
+        <!-- Sample Response -->
+        <div class="pt-2">
+          <span class="text-xs font-semibold text-slate-700 block mb-1">Expected JSON Response (200 OK)</span>
+          <pre class="bg-slate-50 border border-slate-200 text-slate-800 p-3.5 rounded-xl text-xs font-mono leading-relaxed overflow-x-auto"><code>{
+  "status": "success",
+  "message_id": "MSG-90241",
+  "recipient": "01923988380",
+  "operator": "Banglalink",
+  "credits_charged": 1,
+  "balance_remaining": 3,
+  "timestamp": "2026-10-01T04:24:00Z"
+}</code></pre>
+        </div>
+      </div>
+
+      <!-- Endpoint 2: Check Account Balance -->
+      <div class="custom-card p-6 bg-white space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-mono font-bold text-xs">GET</span>
+            <span class="font-mono text-sm font-semibold text-slate-800">/v1/balance</span>
+          </div>
+          <span class="text-xs text-slate-400">Query wallet remaining credits</span>
+        </div>
+
+        <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl text-xs font-mono overflow-x-auto"><code>curl -X GET https://api.smsroutebd.com/v1/balance \
+  -H "Authorization: Bearer sms_live_9a7f34c2b8109d4e5f6a7b8c9d0e1f2a"</code></pre>
+      </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    lucide.createIcons();
+
+    function switchCodeTab(lang) {
+      const tabs = ['curl', 'php', 'node', 'python'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const content = document.getElementById(`code-${t}`);
+        if (t === lang) {
+          btn.className = 'px-3 py-1 rounded-lg bg-slate-900 text-white';
+          content.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3 py-1 rounded-lg hover:bg-slate-100';
+          content.classList.add('hidden');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

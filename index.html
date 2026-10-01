@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Route BD - Modern SMS Gateway Admin Panel</title>
+  
+  <!-- Exact Fonts from font-demo.png: DM Sans & Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"DM Sans"', 'Arial', 'sans-serif'],
+            manrope: ['Manrope', '"DM Sans"', 'sans-serif'],
+            georgia: ['Georgia', 'serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef6ff',
+              100: '#d9eaff',
+              200: '#bcdbff',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              900: '#0f2c59',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f9fafb] text-[rgb(34,45,64)] min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-700 font-sans">
+
+  <!-- Mobile Overlay Backdrop -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
+  <!-- Mobile Top Header Bar -->
+  <header class="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <button id="open-sidebar-btn" type="button" aria-label="Open Sidebar" class="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <a href="index.html" class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
+          <i data-lucide="radio" class="w-5 h-5"></i>
+        </div>
+        <div class="leading-none">
+          <div class="flex items-center gap-1">
+            <span class="font-manrope font-bold text-base text-[rgb(34,45,64)] tracking-tight">SMS Route</span>
+            <span class="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded leading-tight font-sans">BD</span>
+          </div>
+          <span class="text-[8px] uppercase tracking-wider text-[rgb(106,115,128)] font-medium">Connect · Route · Deliver</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Clear, easy to understand Remaining SMS badge -->
+    <a href="buy-credits.html" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200/60 text-amber-900 text-xs font-semibold hover:bg-amber-100 transition-colors font-sans">
+      <i data-lucide="message-square" class="w-3.5 h-3.5 text-amber-600"></i>
+      <span>Balance: 3 SMS</span>
+    </a>
+  </header>
+
+  <div class="flex flex-1 min-h-screen">
+    <!-- Sidebar Navigation (Exact font specs from font-demo.png: DM Sans 14px/20px rgb(34,45,64)) -->
+    <aside id="app-sidebar" class="fixed lg:sticky top-0 left-0 z-50 lg:z-10 h-screen w-72 lg:w-64 bg-white border-r border-slate-200/80 flex flex-col justify-between p-4 -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl lg:shadow-none overflow-y-auto font-sans">
+      
+      <!-- Top Section: Brand & Remaining SMS Balance -->
+      <div class="space-y-4">
+        <!-- Brand Header & Close on mobile -->
+        <div class="flex items-center justify-between pb-1">
+          <a href="index.html" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 rounded-xl bg-blue-600 group-hover:bg-blue-700 flex items-center justify-center text-white shadow-sm transition-colors">
+              <i data-lucide="radio" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5 leading-none">
+                <span class="font-manrope font-bold text-lg text-[rgb(34,45,64)] tracking-tight">SMS Route</span>
+                <span class="bg-blue-600 text-white text-[11px] font-bold px-1.5 py-0.5 rounded leading-tight font-sans">BD</span>
+              </div>
+              <p class="text-[9px] uppercase tracking-widest text-[rgb(106,115,128)] font-semibold mt-0.5">CONNECT · ROUTE · DELIVER</p>
+            </div>
+          </a>
+
+          <button id="close-sidebar-btn" type="button" aria-label="Close Sidebar" class="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <!-- Super Clear Remaining SMS Card -->
+        <a href="buy-credits.html" class="flex items-center justify-between px-3.5 py-2.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl hover:bg-amber-100/70 transition-all group shadow-sm">
+          <div class="flex items-center gap-2 text-[rgb(34,45,64)] text-[13px] font-medium">
+            <i data-lucide="message-square" class="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform"></i>
+            <span>Remaining SMS</span>
+          </div>
+          <span class="text-[14px] font-bold text-amber-900 font-manrope">3 SMS</span>
+        </a>
+
+        <!-- Main Navigation Links (Exact DM Sans 14px / 20px) -->
+        <nav class="space-y-1 pt-1 font-normal text-[14px] leading-[20px] text-[rgb(34,45,64)]">
+          <!-- 1. Dashboard (Active) -->
+          <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-medium transition-colors">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-blue-600"></i>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- 2. Send SMS -->
+          <a href="send-sms.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="send" class="w-4 h-4 text-slate-500"></i>
+            <span>Send SMS</span>
+          </a>
+
+          <!-- 3. Buy SMS / Recharge SMS -->
+          <a href="buy-credits.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="shopping-cart" class="w-4 h-4 text-slate-500"></i>
+            <span>Buy Credits</span>
+          </a>
+
+          <!-- 4. History -->
+          <a href="history.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i>
+            <span>History</span>
+          </a>
+
+          <!-- 5. Referrals -->
+          <a href="referrals.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="gift" class="w-4 h-4 text-slate-500"></i>
+            <span>Referrals</span>
+          </a>
+
+          <!-- 6. Redeem Coupon -->
+          <a href="redeem-coupon.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="ticket" class="w-4 h-4 text-slate-500"></i>
+            <span>Redeem Coupon</span>
+          </a>
+
+          <!-- 7. Settings -->
+          <a href="settings.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="settings" class="w-4 h-4 text-slate-500"></i>
+            <span>Settings</span>
+          </a>
+
+          <!-- 8. API Keys -->
+          <a href="api-keys.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="key" class="w-4 h-4 text-slate-500"></i>
+            <span>API Keys</span>
+          </a>
+
+          <!-- 9. API Guide -->
+          <a href="api-guide.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[rgb(34,45,64)] hover:text-slate-900 hover:bg-slate-100 transition-colors">
+            <i data-lucide="book-open" class="w-4 h-4 text-slate-500"></i>
+            <span>API Guide</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Bottom Account Section -->
+      <div class="pt-6 space-y-3">
+        <!-- Signed in Card -->
+        <div class="p-3 bg-white border border-slate-200/90 rounded-2xl shadow-sm">
+          <p class="text-[10px] font-semibold tracking-wider text-[rgb(106,115,128)] uppercase font-sans">SIGNED IN</p>
+          <p class="text-[13px] font-medium text-[rgb(34,45,64)] truncate mt-0.5" title="rayhan.b2m.tech@gmail.com">
+            rayhan.b2m.tech@gmail.com
+          </p>
+        </div>
+
+        <!-- Sign out link -->
+        <a href="login.html" class="flex items-center gap-2.5 px-2 py-1.5 text-[13px] font-normal text-[rgb(34,45,64)] hover:text-red-600 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4 text-[rgb(106,115,128)]"></i>
+          <span>Sign out</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area (Centered on Large Devices) -->
+    <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-10 flex justify-center">
+      <div class="w-full max-w-5xl xl:max-w-6xl">
+      
+      <!-- Top Workspace Greeting Header (Exact DM Sans & Georgia specs from font-demo.png) -->
+      <div class="mb-8">
+        <p class="text-[11px] leading-[17px] font-medium uppercase tracking-wider text-[rgb(106,115,128)]">YOUR WORKSPACE</p>
+        <p class="text-[13px] text-[rgb(106,115,128)] mb-6">A little closer to your customers.</p>
+
+        <!-- Exact Georgia 400 34px / 41px rgb(34, 45, 64) from font-demo.png -->
+        <h1 class="font-georgia font-normal text-[34px] leading-[41px] text-[rgb(34,45,64)] tracking-tight flex items-center gap-2">
+          <span>Welcome back</span>
+          <span class="inline-block transform origin-bottom-right hover:rotate-12 transition-transform cursor-pointer">👋</span>
+        </h1>
+        <p class="text-[14px] leading-[20px] text-[rgb(106,115,128)] mt-1.5">Here's what's happening with your SMS account.</p>
+      </div>
+
+      <!-- 4 Stat Metric Cards (Exact font sizes & DM Sans 11px / 17px rgb(106,115,128)) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        
+        <!-- Card 1: REMAINING SMS -->
+        <div class="custom-card custom-card-hover p-5 relative overflow-hidden bg-white">
+          <div class="flex items-center justify-between text-[11px] leading-[17px] font-medium text-[rgb(106,115,128)] mb-3 tracking-wider">
+            <span>REMAINING SMS</span>
+            <i data-lucide="message-square" class="w-4 h-4 text-amber-600"></i>
+          </div>
+          <div class="text-[32px] sm:text-[36px] font-bold font-manrope text-[rgb(34,45,64)] tracking-tight">3</div>
+        </div>
+
+        <!-- Card 2: SMS SENT -->
+        <div class="custom-card custom-card-hover p-5 relative overflow-hidden bg-white">
+          <div class="flex items-center justify-between text-[11px] leading-[17px] font-medium text-[rgb(106,115,128)] mb-3 tracking-wider">
+            <span>SMS SENT</span>
+            <i data-lucide="send" class="w-4 h-4 text-emerald-600"></i>
+          </div>
+          <div class="text-[32px] sm:text-[36px] font-bold font-manrope text-[rgb(34,45,64)] tracking-tight">2</div>
+        </div>
+
+        <!-- Card 3: FAILED -->
+        <div class="custom-card custom-card-hover p-5 relative overflow-hidden bg-white">
+          <div class="flex items-center justify-between text-[11px] leading-[17px] font-medium text-[rgb(106,115,128)] mb-3 tracking-wider">
+            <span>FAILED</span>
+            <i data-lucide="trending-up" class="w-4 h-4 text-rose-500"></i>
+          </div>
+          <div class="text-[32px] sm:text-[36px] font-bold font-manrope text-[rgb(34,45,64)] tracking-tight">0</div>
+        </div>
+
+        <!-- Card 4: REFERRALS -->
+        <div class="custom-card custom-card-hover p-5 relative overflow-hidden bg-white">
+          <div class="flex items-center justify-between text-[11px] leading-[17px] font-medium text-[rgb(106,115,128)] mb-3 tracking-wider">
+            <span>REFERRALS</span>
+            <i data-lucide="gift" class="w-4 h-4 text-blue-600"></i>
+          </div>
+          <div class="text-[32px] sm:text-[36px] font-bold font-manrope text-[rgb(34,45,64)] tracking-tight">0</div>
+        </div>
+
+      </div>
+
+      <!-- Middle Grid: Quick Send & Recent Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-6">
+        
+        <!-- Quick Send Card (7 Cols) -->
+        <div class="lg:col-span-7 custom-card p-5 sm:p-6 bg-white flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <i data-lucide="send" class="w-4 h-4 text-blue-600"></i>
+                <!-- Exact Manrope 600 16px / 24px rgb(34, 45, 64) from font-demo.png -->
+                <h2 class="font-manrope font-semibold text-[16px] leading-[24px] text-[rgb(34,45,64)]">Quick send</h2>
+              </div>
+              <a href="send-sms.html" class="text-xs text-[rgb(106,115,128)] hover:text-blue-600 font-medium inline-flex items-center gap-1 transition-colors">
+                <span>Bulk mode</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+
+            <!-- Form -->
+            <form onsubmit="handleQuickSend(event)" class="space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                <!-- Phone input -->
+                <div class="sm:col-span-4">
+                  <input 
+                    type="text" 
+                    id="quick-recipient"
+                    placeholder="01XXXXXXXXX" 
+                    pattern="^(?:\+8801|01)[3-9]\d{8}$"
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 font-sans"
+                    required
+                  >
+                </div>
+
+                <!-- Message input -->
+                <div class="sm:col-span-5">
+                  <input 
+                    type="text" 
+                    id="quick-message"
+                    placeholder="Type your message..." 
+                    data-char-counter="#quick-char-count"
+                    class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400 font-sans"
+                    required
+                  >
+                </div>
+
+                <!-- Send Button -->
+                <div class="sm:col-span-3">
+                  <button 
+                    type="submit" 
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-xl shadow-sm hover:shadow transition-all active:scale-[0.98] font-sans"
+                  >
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    <span>Send</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Counter display (Human-friendly text in DM Sans 11px/17px) -->
+          <div class="pt-3">
+            <span id="quick-char-count" class="text-[11px] leading-[17px] text-[rgb(106,115,128)] font-normal font-sans">
+              0 / 1224 chars · 0 SMS used
+            </span>
+          </div>
+        </div>
+
+        <!-- Recent Activity Card (5 Cols) -->
+        <div class="lg:col-span-5 custom-card p-5 sm:p-6 bg-white flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <!-- Exact Manrope 600 16px / 24px rgb(34, 45, 64) -->
+              <h2 class="font-manrope font-semibold text-[16px] leading-[24px] text-[rgb(34,45,64)]">Recent activity</h2>
+              <a href="history.html" class="text-xs text-[rgb(106,115,128)] hover:text-blue-600 font-medium inline-flex items-center gap-1 transition-colors">
+                <span>View all</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </div>
+
+            <!-- List items -->
+            <div class="space-y-3">
+              <!-- Item 1 -->
+              <div class="flex items-center justify-between text-xs py-1">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-4 h-4 rounded-full border border-emerald-500 text-emerald-500 flex items-center justify-center">
+                    <i data-lucide="check" class="w-2.5 h-2.5 stroke-[3]"></i>
+                  </div>
+                  <span class="font-medium text-[rgb(34,45,64)] tracking-tight">01923988380</span>
+                  <span class="text-[rgb(106,115,128)] truncate max-w-[120px]">test</span>
+                </div>
+                <!-- Exact DM Sans 11px/17px rgb(106,115,128) -->
+                <span class="text-[11px] leading-[17px] text-[rgb(106,115,128)] font-normal font-sans">8m ago</span>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="flex items-center justify-between text-xs py-1">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-4 h-4 rounded-full border border-emerald-500 text-emerald-500 flex items-center justify-center">
+                    <i data-lucide="check" class="w-2.5 h-2.5 stroke-[3]"></i>
+                  </div>
+                  <span class="font-medium text-[rgb(34,45,64)] tracking-tight">01923988380</span>
+                  <span class="text-[rgb(106,115,128)] truncate max-w-[120px]">Hello</span>
+                </div>
+                <!-- Exact DM Sans 11px/17px rgb(106,115,128) -->
+                <span class="text-[11px] leading-[17px] text-[rgb(106,115,128)] font-normal font-sans">10m ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Cards (2 Columns) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+        
+        <!-- Card 1: Send an SMS (Exact Manrope 600 16px/24px rgb(34, 45, 64) from font-demo.png) -->
+        <a href="send-sms.html" class="custom-card custom-card-hover p-6 bg-white block group">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-sm">
+            <i data-lucide="send" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-manrope font-semibold text-[16px] leading-[24px] text-[rgb(34,45,64)] group-hover:text-blue-600 transition-colors">Send an SMS</h3>
+          <p class="text-xs text-[rgb(106,115,128)] mt-1 font-sans">Single or bulk send. Each message costs 1 SMS per recipient.</p>
+        </a>
+
+        <!-- Card 2: Buy more credits -->
+        <a href="buy-credits.html" class="custom-card custom-card-hover p-6 bg-white block group">
+          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4 group-hover:scale-105 transition-transform shadow-sm">
+            <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-manrope font-semibold text-[16px] leading-[24px] text-[rgb(34,45,64)] group-hover:text-blue-600 transition-colors">Buy more credits</h3>
+          <p class="text-xs text-[rgb(106,115,128)] mt-1 font-sans">Flexible SMS packages via bKash or Nagad. Top up anytime.</p>
+        </a>
+
+      </div>
+
+      <!-- Bottom Card: View full send history -->
+      <a href="history.html" class="custom-card custom-card-hover p-5 bg-white flex items-center justify-between group">
+        <div class="flex items-center gap-3">
+          <div class="text-slate-500">
+            <i data-lucide="history" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <!-- Exact Manrope 600 16px/24px rgb(34, 45, 64) -->
+            <h4 class="font-manrope font-semibold text-[15px] sm:text-[16px] leading-[24px] text-[rgb(34,45,64)] group-hover:text-blue-600 transition-colors">View full send history</h4>
+            <p class="text-[11px] leading-[17px] text-[rgb(106,115,128)] mt-0.5 font-sans">All your past SMS messages</p>
+          </div>
+        </div>
+        <div class="text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all">
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </div>
+      </a>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
