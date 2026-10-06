@@ -107,6 +107,53 @@
     <!-- Main Container -->
     <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
+        <!-- Google Sheet Live Sync & Month Selector Toolbar -->
+        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 no-print">
+            <div class="flex items-center space-x-3 w-full md:w-auto">
+                <div id="syncStatusDot" class="w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0"></div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-800" id="syncStatusTitle">Google Sheets Live Sync</span>
+                        <span id="syncStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Connecting...</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-0.5" id="syncLastUpdated">Connecting to Google Sheet...</p>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+                <!-- Month Selection Dropdown (Connected to Google Sheet) -->
+                <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl">
+                    <span class="text-[10px] font-bold uppercase text-slate-500 pl-2">Month:</span>
+                    <select id="sheetMonthSelect" onchange="changeMonth(this.value)" class="bg-white border border-slate-200 text-slate-800 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer">
+                        <option value="October 2026">October 2026</option>
+                        <option value="November 2026">November 2026</option>
+                        <option value="December 2026">December 2026</option>
+                    </select>
+                </div>
+
+                <!-- Sync Now Button -->
+                <button onclick="refreshSheetData(true)" id="btnRefresh" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                    <svg id="syncSpinner" class="w-3.5 h-3.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Sync Now</span>
+                </button>
+
+                <!-- Open Sheet Link -->
+                <a href="https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit?usp=sharing" target="_blank" class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200" title="Open Google Sheet">
+                    <svg class="w-3.5 h-3.5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <span class="hidden sm:inline">Open Sheet</span>
+                </a>
+
+                <!-- Setup Modal Button -->
+                <button onclick="openSetupModal()" class="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold transition border border-teal-200 cursor-pointer">
+                    <span>📋 Setup Sheet</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Doctor Profile Card & KPI Stats (2 cols on mobile, 4 cols on desktop) -->
         <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 print-card space-y-4">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
@@ -116,15 +163,15 @@
                     </div>
                     <div>
                         <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                            <h2 class="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight">Dr. Afroza Supti</h2>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-teal-100 text-teal-800 border border-teal-200">
+                            <h2 class="text-lg sm:text-2xl font-extrabold text-slate-900 tracking-tight" id="doctorTitleName">Dr. Afroza Supti</h2>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-teal-100 text-teal-800 border border-teal-200" id="doctorWardBadge">
                                 POW Ward
                             </span>
                         </div>
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] sm:text-xs text-slate-500 font-mono mt-0.5">
-                            <span>ID: <strong class="text-slate-800">7269766</strong></span>
+                            <span>ID: <strong class="text-slate-800" id="doctorStaffId">7269766</strong></span>
                             <span>&bull;</span>
-                            <span class="hidden sm:inline">October 2026</span>
+                            <span class="hidden sm:inline" id="doctorProfileMonth">October 2026</span>
                             <span class="hidden sm:inline">&bull;</span>
                             <button onclick="goToToday()" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition cursor-pointer" title="Go to Today's schedule">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
@@ -137,7 +184,8 @@
                 <!-- Month Badge on desktop -->
                 <div class="hidden sm:block text-right">
                     <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Schedule Month</div>
-                    <div class="text-lg font-black text-slate-800">October 2026</div>
+                    <div class="text-lg font-black text-slate-800" id="desktopMonthText">October 2026</div>
+                    <div class="text-[11px] text-teal-700 font-medium" id="desktopMonthDays">31 Calendar Days</div>
                     <div class="flex items-center justify-end gap-1.5 mt-0.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-600 animate-pulse"></span>
                         <span class="text-[11px] text-teal-700 font-bold" id="desktopTodayText">Today is Oct 5, 2026</span>
@@ -151,7 +199,7 @@
                     <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider flex items-center justify-center gap-1">
                         <span>☀️ Day (D)</span>
                     </div>
-                    <div class="text-xl sm:text-2xl font-black text-amber-950 mt-0.5">10</div>
+                    <div class="text-xl sm:text-2xl font-black text-amber-950 mt-0.5" id="kpiDayCount">10</div>
                     <div class="text-[10px] text-amber-700 font-medium">08:00 &ndash; 20:00</div>
                 </div>
 
@@ -159,7 +207,7 @@
                     <div class="text-[10px] font-bold text-indigo-800 uppercase tracking-wider flex items-center justify-center gap-1">
                         <span>🌙 Night (N)</span>
                     </div>
-                    <div class="text-xl sm:text-2xl font-black text-indigo-950 mt-0.5">7</div>
+                    <div class="text-xl sm:text-2xl font-black text-indigo-950 mt-0.5" id="kpiNightCount">7</div>
                     <div class="text-[10px] text-indigo-700 font-medium">20:00 &ndash; 08:00</div>
                 </div>
 
@@ -167,7 +215,7 @@
                     <div class="text-[10px] font-bold text-teal-800 uppercase tracking-wider flex items-center justify-center gap-1">
                         <span>🏥 Duties</span>
                     </div>
-                    <div class="text-xl sm:text-2xl font-black text-teal-950 mt-0.5">17</div>
+                    <div class="text-xl sm:text-2xl font-black text-teal-950 mt-0.5" id="kpiDutyCount">17</div>
                     <div class="text-[10px] text-teal-700 font-medium">Total Shifts</div>
                 </div>
 
@@ -175,7 +223,7 @@
                     <div class="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center justify-center gap-1">
                         <span>🏖️ Off Days</span>
                     </div>
-                    <div class="text-xl sm:text-2xl font-black text-slate-800 mt-0.5">14</div>
+                    <div class="text-xl sm:text-2xl font-black text-slate-800 mt-0.5" id="kpiOffCount">14</div>
                     <div class="text-[10px] text-slate-500 font-medium">Rest Days</div>
                 </div>
             </div>
@@ -217,7 +265,7 @@
             <!-- Calendar Navigation Title -->
             <div class="flex items-center justify-between pb-2.5 border-b border-slate-200">
                 <div class="flex items-center space-x-2">
-                    <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+                    <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight" id="calendarMonthTitle">
                         October 2026
                     </h3>
                     <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
@@ -285,7 +333,7 @@
         <!-- VIEW 2: AGENDA / LIST VIEW (Perfect for Mobile Scrolling) -->
         <div id="container-list-view" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 print-card p-3 sm:p-5 space-y-3">
             <div class="flex items-center justify-between pb-2.5 border-b border-slate-200">
-                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight" id="agendaMonthTitle">
                     Daily Schedule Agenda &mdash; October 2026
                 </h3>
                 <div class="flex items-center space-x-2">
@@ -293,7 +341,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-teal-600 animate-pulse"></span>
                         <span>Today</span>
                     </button>
-                    <span class="text-xs text-slate-500 font-mono hidden sm:inline">1 &ndash; 31 Oct</span>
+                    <span class="text-xs text-slate-500 font-mono hidden sm:inline" id="agendaDateRange">1 &ndash; 31 Oct</span>
                 </div>
             </div>
 
@@ -309,6 +357,70 @@
         </div>
 
     </main>
+
+    <!-- Google Sheet Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <span class="px-2 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Google Sheets Sync</span>
+                    <h3 class="text-base sm:text-lg font-extrabold text-slate-900 mt-1">গুগল শিট সেটআপ ও লাইভ সিঙ্ক</h3>
+                </div>
+                <button onclick="closeSetupModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                <p class="font-medium text-slate-700">
+                    আপনার সংযুক্ত গুগল শিট: <br>
+                    <a href="https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit?usp=sharing" target="_blank" class="text-teal-600 hover:underline font-mono break-all font-bold">
+                        https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit
+                    </a>
+                </p>
+
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2">
+                    <div class="font-extrabold text-emerald-950 text-sm">⚡ মাত্র ১ ক্লিকে শিট সাজিয়ে ফেলুন:</div>
+                    <ol class="list-decimal list-inside space-y-1.5 text-emerald-900">
+                        <li>নিচের <strong>"Copy All Data (TSV)"</strong> বাটনে ক্লিক করুন।</li>
+                        <li>গুগল শিটটি ওপেন করে প্রথম সেল <strong>A1</strong>-এ ক্লিক করুন।</li>
+                        <li>কিবোর্ড থেকে <strong>Ctrl + V</strong> (Paste) চাপুন।</li>
+                        <li>এরপর এই পেজের <strong>"Sync Now"</strong> বাটনে ক্লিক করলেই লাইভ শিডিউল চলে আসবে!</li>
+                    </ol>
+                </div>
+
+                <div class="flex items-center gap-2 pt-1">
+                    <button onclick="copyTsvData()" id="btnCopyTsv" class="flex-1 py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        <span id="copyTsvText">📋 Copy All Data (TSV)</span>
+                    </button>
+                    <a href="https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit?usp=sharing" target="_blank" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition border border-slate-200 flex items-center gap-1">
+                        <span>🔗 Open Google Sheet</span>
+                    </a>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5 text-slate-600">
+                    <div class="font-bold text-slate-800">💡 শিট থেকে যা যা পরিবর্তন করতে পারবেন:</div>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><strong>Shift:</strong> 'D' (Day), 'N' (Night), বা 'OFF' লিখুন।</li>
+                        <li><strong>Time:</strong> যেকোনো কাস্টম ডিউটি সময় দিতে পারবেন।</li>
+                        <li><strong>Ward / Doctor Name:</strong> শিটে পরিবর্তন করলেই ওয়েব পেজে তা বদলে যাবে।</li>
+                        <li><strong>Month:</strong> শিটে নতুন মাসের নাম দিয়ে নতুন ট্যাব (যেমন: 'November 2026') তৈরি করতে পারবেন।</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeSetupModal()" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Shift Detail Popup Modal -->
     <div id="dayModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
@@ -345,85 +457,229 @@
 
     <!-- Script -->
     <script>
-        // Exact shifts for Dr. Afroza Supti from demo.jpeg
-        const DOCTOR_SHIFTS = {
-            1: 'D',
-            2: '',
-            3: '',
-            4: 'D',
-            5: 'N',
-            6: '',
-            7: 'D',
-            8: 'D',
-            9: 'N',
-            10: '',
-            11: '',
-            12: 'D',
-            13: 'N',
-            14: '',
-            15: '',
-            16: 'D',
-            17: 'N',
-            18: '',
-            19: 'D',
-            20: 'D',
-            21: 'N',
-            22: '',
-            23: '',
-            24: 'D',
-            25: 'N',
-            26: '',
-            27: '',
-            28: 'D',
-            29: 'N',
-            30: '',
-            31: ''
+        // Google Sheet Configuration
+        const SPREADSHEET_ID = '11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY';
+
+        // Default shifts for Dr. Afroza Supti (October 2026) as baseline fallback
+        const DEFAULT_DOCTOR_SHIFTS = {
+            1: 'D', 2: '', 3: '', 4: 'D', 5: 'N', 6: '', 7: 'D', 8: 'D',
+            9: 'N', 10: '', 11: '', 12: 'D', 13: 'N', 14: '', 15: '',
+            16: 'D', 17: 'N', 18: '', 19: 'D', 20: 'D', 21: 'N', 22: '',
+            23: '', 24: 'D', 25: 'N', 26: '', 27: '', 28: 'D', 29: 'N',
+            30: '', 31: ''
         };
 
-        const DAY_NAMES = [
-            'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-            'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-            'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-            'Thursday', 'Friday', 'Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday',
-            'Thursday', 'Friday', 'Saturday'
-        ];
+        // Tab-separated values with dynamic formulas for 1-click clipboard paste into Google Sheets (A1)
+        const TSV_INITIAL_DATA = `Date\tDay\tShift\tShift Name\tTime\tWard\tDoctor Name\tStaff ID\tMonth\tNotes
+1\t=TEXT(DATE(2026, 10, A2), "dddd")\tD\t=IF(C2="D", "Day Shift (☀️)", IF(C2="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C2="D", "08:00 - 20:00", IF(C2="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C2="D", "12 Hours Day Duty", IF(C2="N", "12 Hours Overnight Duty", "Rest Day"))
+2\t=TEXT(DATE(2026, 10, A3), "dddd")\tOFF\t=IF(C3="D", "Day Shift (☀️)", IF(C3="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C3="D", "08:00 - 20:00", IF(C3="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C3="D", "12 Hours Day Duty", IF(C3="N", "12 Hours Overnight Duty", "Rest Day"))
+3\t=TEXT(DATE(2026, 10, A4), "dddd")\tOFF\t=IF(C4="D", "Day Shift (☀️)", IF(C4="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C4="D", "08:00 - 20:00", IF(C4="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C4="D", "12 Hours Day Duty", IF(C4="N", "12 Hours Overnight Duty", "Rest Day"))
+4\t=TEXT(DATE(2026, 10, A5), "dddd")\tD\t=IF(C5="D", "Day Shift (☀️)", IF(C5="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C5="D", "08:00 - 20:00", IF(C5="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C5="D", "12 Hours Day Duty", IF(C5="N", "12 Hours Overnight Duty", "Rest Day"))
+5\t=TEXT(DATE(2026, 10, A6), "dddd")\tN\t=IF(C6="D", "Day Shift (☀️)", IF(C6="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C6="D", "08:00 - 20:00", IF(C6="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C6="D", "12 Hours Day Duty", IF(C6="N", "12 Hours Overnight Duty", "Rest Day"))
+6\t=TEXT(DATE(2026, 10, A7), "dddd")\tOFF\t=IF(C7="D", "Day Shift (☀️)", IF(C7="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C7="D", "08:00 - 20:00", IF(C7="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C7="D", "12 Hours Day Duty", IF(C7="N", "12 Hours Overnight Duty", "Rest Day"))
+7\t=TEXT(DATE(2026, 10, A8), "dddd")\tD\t=IF(C8="D", "Day Shift (☀️)", IF(C8="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C8="D", "08:00 - 20:00", IF(C8="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C8="D", "12 Hours Day Duty", IF(C8="N", "12 Hours Overnight Duty", "Rest Day"))
+8\t=TEXT(DATE(2026, 10, A9), "dddd")\tD\t=IF(C9="D", "Day Shift (☀️)", IF(C9="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C9="D", "08:00 - 20:00", IF(C9="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C9="D", "12 Hours Day Duty", IF(C9="N", "12 Hours Overnight Duty", "Rest Day"))
+9\t=TEXT(DATE(2026, 10, A10), "dddd")\tN\t=IF(C10="D", "Day Shift (☀️)", IF(C10="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C10="D", "08:00 - 20:00", IF(C10="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C10="D", "12 Hours Day Duty", IF(C10="N", "12 Hours Overnight Duty", "Rest Day"))
+10\t=TEXT(DATE(2026, 10, A11), "dddd")\tOFF\t=IF(C11="D", "Day Shift (☀️)", IF(C11="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C11="D", "08:00 - 20:00", IF(C11="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C11="D", "12 Hours Day Duty", IF(C11="N", "12 Hours Overnight Duty", "Rest Day"))
+11\t=TEXT(DATE(2026, 10, A12), "dddd")\tOFF\t=IF(C12="D", "Day Shift (☀️)", IF(C12="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C12="D", "08:00 - 20:00", IF(C12="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C12="D", "12 Hours Day Duty", IF(C12="N", "12 Hours Overnight Duty", "Rest Day"))
+12\t=TEXT(DATE(2026, 10, A13), "dddd")\tD\t=IF(C13="D", "Day Shift (☀️)", IF(C13="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C13="D", "08:00 - 20:00", IF(C13="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C13="D", "12 Hours Day Duty", IF(C13="N", "12 Hours Overnight Duty", "Rest Day"))
+13\t=TEXT(DATE(2026, 10, A14), "dddd")\tN\t=IF(C14="D", "Day Shift (☀️)", IF(C14="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C14="D", "08:00 - 20:00", IF(C14="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C14="D", "12 Hours Day Duty", IF(C14="N", "12 Hours Overnight Duty", "Rest Day"))
+14\t=TEXT(DATE(2026, 10, A15), "dddd")\tOFF\t=IF(C15="D", "Day Shift (☀️)", IF(C15="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C15="D", "08:00 - 20:00", IF(C15="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C15="D", "12 Hours Day Duty", IF(C15="N", "12 Hours Overnight Duty", "Rest Day"))
+15\t=TEXT(DATE(2026, 10, A16), "dddd")\tOFF\t=IF(C16="D", "Day Shift (☀️)", IF(C16="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C16="D", "08:00 - 20:00", IF(C16="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C16="D", "12 Hours Day Duty", IF(C16="N", "12 Hours Overnight Duty", "Rest Day"))
+16\t=TEXT(DATE(2026, 10, A17), "dddd")\tD\t=IF(C17="D", "Day Shift (☀️)", IF(C17="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C17="D", "08:00 - 20:00", IF(C17="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C17="D", "12 Hours Day Duty", IF(C17="N", "12 Hours Overnight Duty", "Rest Day"))
+17\t=TEXT(DATE(2026, 10, A18), "dddd")\tN\t=IF(C18="D", "Day Shift (☀️)", IF(C18="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C18="D", "08:00 - 20:00", IF(C18="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C18="D", "12 Hours Day Duty", IF(C18="N", "12 Hours Overnight Duty", "Rest Day"))
+18\t=TEXT(DATE(2026, 10, A19), "dddd")\tOFF\t=IF(C19="D", "Day Shift (☀️)", IF(C19="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C19="D", "08:00 - 20:00", IF(C19="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C19="D", "12 Hours Day Duty", IF(C19="N", "12 Hours Overnight Duty", "Rest Day"))
+19\t=TEXT(DATE(2026, 10, A20), "dddd")\tD\t=IF(C20="D", "Day Shift (☀️)", IF(C20="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C20="D", "08:00 - 20:00", IF(C20="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C20="D", "12 Hours Day Duty", IF(C20="N", "12 Hours Overnight Duty", "Rest Day"))
+20\t=TEXT(DATE(2026, 10, A21), "dddd")\tD\t=IF(C21="D", "Day Shift (☀️)", IF(C21="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C21="D", "08:00 - 20:00", IF(C21="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C21="D", "12 Hours Day Duty", IF(C21="N", "12 Hours Overnight Duty", "Rest Day"))
+21\t=TEXT(DATE(2026, 10, A22), "dddd")\tN\t=IF(C22="D", "Day Shift (☀️)", IF(C22="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C22="D", "08:00 - 20:00", IF(C22="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C22="D", "12 Hours Day Duty", IF(C22="N", "12 Hours Overnight Duty", "Rest Day"))
+22\t=TEXT(DATE(2026, 10, A23), "dddd")\tOFF\t=IF(C23="D", "Day Shift (☀️)", IF(C23="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C23="D", "08:00 - 20:00", IF(C23="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C23="D", "12 Hours Day Duty", IF(C23="N", "12 Hours Overnight Duty", "Rest Day"))
+23\t=TEXT(DATE(2026, 10, A24), "dddd")\tOFF\t=IF(C24="D", "Day Shift (☀️)", IF(C24="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C24="D", "08:00 - 20:00", IF(C24="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C24="D", "12 Hours Day Duty", IF(C24="N", "12 Hours Overnight Duty", "Rest Day"))
+24\t=TEXT(DATE(2026, 10, A25), "dddd")\tD\t=IF(C25="D", "Day Shift (☀️)", IF(C25="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C25="D", "08:00 - 20:00", IF(C25="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C25="D", "12 Hours Day Duty", IF(C25="N", "12 Hours Overnight Duty", "Rest Day"))
+25\t=TEXT(DATE(2026, 10, A26), "dddd")\tN\t=IF(C26="D", "Day Shift (☀️)", IF(C26="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C26="D", "08:00 - 20:00", IF(C26="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C26="D", "12 Hours Day Duty", IF(C26="N", "12 Hours Overnight Duty", "Rest Day"))
+26\t=TEXT(DATE(2026, 10, A27), "dddd")\tOFF\t=IF(C27="D", "Day Shift (☀️)", IF(C27="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C27="D", "08:00 - 20:00", IF(C27="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C27="D", "12 Hours Day Duty", IF(C27="N", "12 Hours Overnight Duty", "Rest Day"))
+27\t=TEXT(DATE(2026, 10, A28), "dddd")\tOFF\t=IF(C28="D", "Day Shift (☀️)", IF(C28="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C28="D", "08:00 - 20:00", IF(C28="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C28="D", "12 Hours Day Duty", IF(C28="N", "12 Hours Overnight Duty", "Rest Day"))
+28\t=TEXT(DATE(2026, 10, A29), "dddd")\tD\t=IF(C29="D", "Day Shift (☀️)", IF(C29="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C29="D", "08:00 - 20:00", IF(C29="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C29="D", "12 Hours Day Duty", IF(C29="N", "12 Hours Overnight Duty", "Rest Day"))
+29\t=TEXT(DATE(2026, 10, A30), "dddd")\tN\t=IF(C30="D", "Day Shift (☀️)", IF(C30="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C30="D", "08:00 - 20:00", IF(C30="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C30="D", "12 Hours Day Duty", IF(C30="N", "12 Hours Overnight Duty", "Rest Day"))
+30\t=TEXT(DATE(2026, 10, A31), "dddd")\tOFF\t=IF(C31="D", "Day Shift (☀️)", IF(C31="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C31="D", "08:00 - 20:00", IF(C31="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C31="D", "12 Hours Day Duty", IF(C31="N", "12 Hours Overnight Duty", "Rest Day"))
+31\t=TEXT(DATE(2026, 10, A32), "dddd")\tOFF\t=IF(C32="D", "Day Shift (☀️)", IF(C32="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C32="D", "08:00 - 20:00", IF(C32="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C32="D", "12 Hours Day Duty", IF(C32="N", "12 Hours Overnight Duty", "Rest Day"))`;
 
-        // Detect current date for October 2026 or fallback to Oct 5, 2026
-        function getTodayDate() {
-            const now = new Date();
-            if (now.getFullYear() === 2026 && now.getMonth() === 9) {
-                return now.getDate();
-            }
-            return 5; // Default fallback to October 5th, 2026
+        // State variables
+        let activeMonth = 'October 2026';
+        let currentShifts = { ...DEFAULT_DOCTOR_SHIFTS };
+        let customTimes = {};
+        let customNotes = {};
+        let customWards = {};
+        let doctorInfo = {
+            name: 'Dr. Afroza Supti',
+            staffId: '7269766',
+            ward: 'POW Ward'
+        };
+        let availableMonths = ['October 2026', 'November 2026', 'December 2026'];
+        let activeFilter = 'all';
+        let currentSelectedDay = 5;
+        let isSyncing = false;
+        let lastSyncTime = null;
+
+        // Modal Controls
+        function openSetupModal() {
+            document.getElementById('setupModal').classList.remove('hidden');
         }
 
-        const todayDate = getTodayDate();
-        let activeFilter = 'all';
-        let currentSelectedDay = todayDate;
+        function closeModal() {
+            document.getElementById('dayModal').classList.add('hidden');
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function closeSetupModal() {
+            document.getElementById('setupModal').classList.add('hidden');
+        }
+
+        function copyTsvData() {
+            navigator.clipboard.writeText(TSV_INITIAL_DATA).then(() => {
+                const btnText = document.getElementById('copyTsvText');
+                const originalText = btnText.textContent;
+                btnText.textContent = 'Copied to Clipboard! ✅';
+                setTimeout(() => {
+                    btnText.textContent = originalText;
+                }, 3000);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Could not copy automatically. Please open Dr_Supti_Duty_Schedule_October_2026.tsv to copy.');
+            });
+        }
+
+        // Calculate dynamic Month details (Days count, first weekday, etc.)
+        function getMonthMeta(monthYearString) {
+            const months = {
+                'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
+                'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11
+            };
+            const parts = (monthYearString || 'October 2026').trim().split(/\s+/);
+            let monthIdx = 9; // Default October
+            let year = 2026;
+            if (parts.length >= 2) {
+                const mName = parts[0].toLowerCase();
+                if (months[mName] !== undefined) monthIdx = months[mName];
+                const yNum = parseInt(parts[1], 10);
+                if (!isNaN(yNum)) year = yNum;
+            }
+            const totalDays = new Date(year, monthIdx + 1, 0).getDate();
+            const firstDayOfWeek = new Date(year, monthIdx, 1).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+
+            return {
+                year,
+                monthIdx,
+                totalDays,
+                firstDayOfWeek,
+                monthName: parts[0] || 'October'
+            };
+        }
+
+        function getWeekdayName(year, monthIdx, day) {
+            const date = new Date(year, monthIdx, day);
+            return date.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+
+        // Detect current date for the selected month or fallback
+        function getTodayDate() {
+            const now = new Date();
+            const meta = getMonthMeta(activeMonth);
+            if (now.getFullYear() === meta.year && now.getMonth() === meta.monthIdx) {
+                return now.getDate();
+            }
+            // If viewing October 2026, default to 5
+            return (meta.year === 2026 && meta.monthIdx === 9) ? 5 : 1;
+        }
+
+        // KPI calculation based on current shifts
+        function calculateKPIs() {
+            const meta = getMonthMeta(activeMonth);
+            let dayCount = 0;
+            let nightCount = 0;
+
+            for (let d = 1; d <= meta.totalDays; d++) {
+                const s = currentShifts[d];
+                if (s === 'D') dayCount++;
+                else if (s === 'N') nightCount++;
+            }
+
+            const dutyCount = dayCount + nightCount;
+            const offCount = meta.totalDays - dutyCount;
+
+            return { dayCount, nightCount, dutyCount, offCount, totalDays: meta.totalDays };
+        }
+
+        // Update KPI and info counters in DOM
+        function updateUIStats() {
+            const kpis = calculateKPIs();
+            const meta = getMonthMeta(activeMonth);
+
+            // KPI stats cards
+            const elDay = document.getElementById('kpiDayCount');
+            const elNight = document.getElementById('kpiNightCount');
+            const elDuty = document.getElementById('kpiDutyCount');
+            const elOff = document.getElementById('kpiOffCount');
+
+            if (elDay) elDay.textContent = kpis.dayCount;
+            if (elNight) elNight.textContent = kpis.nightCount;
+            if (elDuty) elDuty.textContent = kpis.dutyCount;
+            if (elOff) elOff.textContent = kpis.offCount;
+
+            // Filter pills counts
+            const btnAll = document.getElementById('btn-all');
+            const btnD = document.getElementById('btn-D');
+            const btnN = document.getElementById('btn-N');
+            const btnOff = document.getElementById('btn-OFF');
+
+            if (btnAll) btnAll.textContent = `All (${kpis.totalDays})`;
+            if (btnD) btnD.textContent = `☀️ Day (${kpis.dayCount})`;
+            if (btnN) btnN.textContent = `🌙 Night (${kpis.nightCount})`;
+            if (btnOff) btnOff.textContent = `🏖️ Off (${kpis.offCount})`;
+
+            // Doctor Info Card elements
+            const docTitle = document.getElementById('doctorTitleName');
+            const docWard = document.getElementById('doctorWardBadge');
+            const docStaffId = document.getElementById('doctorStaffId');
+            const docProfMonth = document.getElementById('doctorProfileMonth');
+            const deskMonth = document.getElementById('desktopMonthText');
+            const deskDays = document.getElementById('desktopMonthDays');
+            const calTitle = document.getElementById('calendarMonthTitle');
+            const agendaTitle = document.getElementById('agendaMonthTitle');
+            const agendaRange = document.getElementById('agendaDateRange');
+
+            if (docTitle) docTitle.textContent = doctorInfo.name;
+            if (docWard) docWard.textContent = doctorInfo.ward;
+            if (docStaffId) docStaffId.textContent = doctorInfo.staffId;
+            if (docProfMonth) docProfMonth.textContent = activeMonth;
+            if (deskMonth) deskMonth.textContent = activeMonth;
+            if (deskDays) deskDays.textContent = `${meta.totalDays} Calendar Days`;
+            if (calTitle) calTitle.textContent = activeMonth;
+            if (agendaTitle) agendaTitle.textContent = `Daily Schedule Agenda — ${activeMonth}`;
+            if (agendaRange) agendaRange.textContent = `1 – ${meta.totalDays} ${meta.monthName.slice(0, 3)}`;
+
             updateTodayBadges();
-            renderCalendar();
-            renderAgendaList();
-            showDayDetails(todayDate);
-        });
+        }
 
         function updateTodayBadges() {
-            const shift = DOCTOR_SHIFTS[todayDate] || '';
+            const todayDate = getTodayDate();
+            const shift = currentShifts[todayDate] || '';
             const shiftLabel = shift === 'D' ? '☀️ Day Shift' : shift === 'N' ? '🌙 Night Shift' : '🏖️ Off Day';
+            const meta = getMonthMeta(activeMonth);
+
             const badgeEl = document.getElementById('todayHeaderBadgeText');
             if (badgeEl) {
-                badgeEl.innerHTML = `Today: Oct ${todayDate} &bull; ${shiftLabel}`;
+                badgeEl.innerHTML = `Today: ${meta.monthName.slice(0, 3)} ${todayDate} &bull; ${shiftLabel}`;
             }
+
             const desktopTodayEl = document.getElementById('desktopTodayText');
             if (desktopTodayEl) {
-                desktopTodayEl.textContent = `Today: Oct ${todayDate}, 2026`;
+                desktopTodayEl.textContent = `Today: ${meta.monthName.slice(0, 3)} ${todayDate}, ${meta.year}`;
             }
         }
 
         function goToToday() {
+            const todayDate = getTodayDate();
             currentSelectedDay = todayDate;
-            const todayShift = DOCTOR_SHIFTS[todayDate] || '';
+            const todayShift = currentShifts[todayDate] || '';
             if (activeFilter === 'D' && todayShift !== 'D') setFilter('all');
             else if (activeFilter === 'N' && todayShift !== 'N') setFilter('all');
             else if (activeFilter === 'OFF' && todayShift !== '') setFilter('all');
@@ -433,18 +689,13 @@
             }
             showDayDetails(todayDate);
 
-            // Smooth scroll to the today element
             const gridView = document.getElementById('container-grid-view');
             if (gridView && !gridView.classList.contains('hidden')) {
                 const cell = document.getElementById(`calendar-cell-${todayDate}`);
-                if (cell) {
-                    cell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
+                if (cell) cell.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } else {
                 const item = document.getElementById(`agenda-item-${todayDate}`);
-                if (item) {
-                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
+                if (item) item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
@@ -471,36 +722,46 @@
             activeFilter = type;
             ['all', 'D', 'N', 'OFF'].forEach(t => {
                 const btn = document.getElementById('btn-' + t);
-                btn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition shrink-0';
+                if (btn) btn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition shrink-0';
             });
             const activeBtn = document.getElementById('btn-' + type);
-            if (type === 'all') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-xs transition shrink-0';
-            if (type === 'D') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-amber-200 text-amber-950 border border-amber-300 shadow-xs transition shrink-0';
-            if (type === 'N') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-indigo-200 text-indigo-950 border border-indigo-300 shadow-xs transition shrink-0';
-            if (type === 'OFF') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-300 text-slate-800 shadow-xs transition shrink-0';
+            if (activeBtn) {
+                if (type === 'all') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white shadow-xs transition shrink-0';
+                if (type === 'D') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-amber-200 text-amber-950 border border-amber-300 shadow-xs transition shrink-0';
+                if (type === 'N') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-indigo-200 text-indigo-950 border border-indigo-300 shadow-xs transition shrink-0';
+                if (type === 'OFF') activeBtn.className = 'px-2.5 py-1 rounded-lg font-bold bg-slate-300 text-slate-800 shadow-xs transition shrink-0';
+            }
 
             renderCalendar();
             renderAgendaList();
         }
 
-        // Render Calendar Grid (Compact on mobile, expanded on desktop)
+        // Render Calendar Grid dynamically
         function renderCalendar() {
             const grid = document.getElementById('calendarDaysGrid');
+            if (!grid) return;
             grid.innerHTML = '';
 
-            // 4 Padding Days for September 27..30 (Oct 1 is Thursday)
-            for (let pad = 0; pad < 4; pad++) {
+            const meta = getMonthMeta(activeMonth);
+            const todayDate = getTodayDate();
+
+            // Calculate previous month padding days
+            const prevMonthLastDate = new Date(meta.year, meta.monthIdx, 0).getDate();
+            const padDaysCount = meta.firstDayOfWeek; // 0=Sun (0 pads), 4=Thu (4 pads: Sun..Wed)
+
+            for (let pad = padDaysCount; pad > 0; pad--) {
+                const padDateNum = prevMonthLastDate - pad + 1;
                 const cell = document.createElement('div');
                 cell.className = 'bg-slate-50/60 border border-slate-100 rounded-lg sm:rounded-xl p-1 sm:p-2 min-h-[52px] sm:min-h-[96px] opacity-30 select-none';
-                cell.innerHTML = `<span class="text-[9px] sm:text-[10px] font-bold text-slate-400">Sep ${27 + pad}</span>`;
+                cell.innerHTML = `<span class="text-[9px] sm:text-[10px] font-bold text-slate-400">${padDateNum}</span>`;
                 grid.appendChild(cell);
             }
 
-            // Days 1 to 31
-            for (let day = 1; day <= 31; day++) {
-                const shift = DOCTOR_SHIFTS[day] || '';
-                const dayName = DAY_NAMES[day - 1];
-                const dayOfWeekIdx = (3 + day) % 7;
+            // Days 1 to totalDays
+            for (let day = 1; day <= meta.totalDays; day++) {
+                const shift = currentShifts[day] || '';
+                const dayName = getWeekdayName(meta.year, meta.monthIdx, day);
+                const dayOfWeekIdx = new Date(meta.year, meta.monthIdx, day).getDay();
                 const isFri = dayOfWeekIdx === 5;
                 const isSat = dayOfWeekIdx === 6;
 
@@ -517,12 +778,15 @@
                 cell.onclick = () => {
                     currentSelectedDay = day;
                     showDayDetails(day);
-                    renderCalendar(); // refresh selected ring
+                    renderCalendar();
                 };
 
                 let cellBg = 'bg-white border-slate-200';
                 let mobileBadge = '';
                 let desktopBadge = '';
+
+                const customTime = customTimes[day];
+                const customWard = customWards[day] || doctorInfo.ward;
 
                 if (shift === 'D') {
                     cellBg = 'bg-amber-50/80 border-amber-300';
@@ -534,7 +798,7 @@
                     desktopBadge = `
                         <div class="mt-1.5 p-1 rounded-lg bg-amber-100 text-amber-950 border border-amber-300 flex items-center justify-between">
                             <span class="font-black text-xs flex items-center gap-1">☀️ DAY</span>
-                            <span class="text-[9px] font-mono font-bold">08:00 - 20:00</span>
+                            <span class="text-[9px] font-mono font-bold">${customTime || '08:00 - 20:00'}</span>
                         </div>
                     `;
                 } else if (shift === 'N') {
@@ -547,7 +811,7 @@
                     desktopBadge = `
                         <div class="mt-1.5 p-1 rounded-lg bg-indigo-100 text-indigo-950 border border-indigo-300 flex items-center justify-between">
                             <span class="font-black text-xs flex items-center gap-1">🌙 NIGHT</span>
-                            <span class="text-[9px] font-mono font-bold">20:00 - 08:00</span>
+                            <span class="text-[9px] font-mono font-bold">${customTime || '20:00 - 08:00'}</span>
                         </div>
                     `;
                 } else {
@@ -610,7 +874,7 @@
                     <!-- Full details on Desktop (sm+) -->
                     <div class="hidden sm:block">
                         ${desktopBadge}
-                        <div class="text-[9px] text-slate-400 font-mono text-right mt-1">POW Ward</div>
+                        <div class="text-[9px] text-slate-400 font-mono text-right mt-1">${customWard}</div>
                     </div>
                 `;
 
@@ -618,17 +882,20 @@
             }
         }
 
-        // Render Agenda / List View
+        // Render Agenda / List View dynamically
         function renderAgendaList() {
             const container = document.getElementById('agendaListContainer');
+            if (!container) return;
             container.innerHTML = '';
 
+            const meta = getMonthMeta(activeMonth);
+            const todayDate = getTodayDate();
             let hasMatches = false;
 
-            for (let day = 1; day <= 31; day++) {
-                const shift = DOCTOR_SHIFTS[day] || '';
-                const dayName = DAY_NAMES[day - 1];
-                const dayOfWeekIdx = (3 + day) % 7;
+            for (let day = 1; day <= meta.totalDays; day++) {
+                const shift = currentShifts[day] || '';
+                const dayName = getWeekdayName(meta.year, meta.monthIdx, day);
+                const dayOfWeekIdx = new Date(meta.year, meta.monthIdx, day).getDay();
                 const isFri = dayOfWeekIdx === 5;
                 const isSat = dayOfWeekIdx === 6;
 
@@ -641,6 +908,8 @@
                 hasMatches = true;
 
                 const isToday = (day === todayDate);
+                const customTime = customTimes[day];
+                const customWard = customWards[day] || doctorInfo.ward;
 
                 const item = document.createElement('div');
                 item.id = `agenda-item-${day}`;
@@ -655,10 +924,10 @@
 
                 if (shift === 'D') {
                     cardBg = isToday ? 'bg-amber-50/90 border-teal-500 ring-2 ring-teal-500/50 shadow-xs' : 'bg-amber-50/70 border-amber-300';
-                    badge = '<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-amber-200 text-amber-950 border border-amber-300 flex items-center gap-1">☀️ Day Shift (08:00 - 20:00)</span>';
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-amber-200 text-amber-950 border border-amber-300 flex items-center gap-1">☀️ Day Shift (${customTime || '08:00 - 20:00'})</span>`;
                 } else if (shift === 'N') {
                     cardBg = isToday ? 'bg-indigo-50/90 border-teal-500 ring-2 ring-teal-500/50 shadow-xs' : 'bg-indigo-50/70 border-indigo-300';
-                    badge = '<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-indigo-200 text-indigo-950 border border-indigo-300 flex items-center gap-1">🌙 Night Shift (20:00 - 08:00)</span>';
+                    badge = `<span class="px-2.5 py-1 rounded-lg text-xs font-black bg-indigo-200 text-indigo-950 border border-indigo-300 flex items-center gap-1">🌙 Night Shift (${customTime || '20:00 - 08:00'})</span>`;
                 } else {
                     cardBg = isToday ? 'bg-teal-50 border-teal-500 ring-2 ring-teal-500/50 shadow-xs' : (isFri ? 'bg-rose-50/40 border-rose-200' : isSat ? 'bg-amber-50/30 border-amber-200' : 'bg-slate-50 border-slate-200');
                     badge = '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-200 text-slate-700">🏖️ Off Duty</span>';
@@ -676,7 +945,7 @@
                         </div>
                         <div class="border-l border-slate-200 pl-3">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <div class="text-xs font-bold text-slate-800">October ${day}, 2026 &bull; ${dayName}</div>
+                                <div class="text-xs font-bold text-slate-800">${meta.monthName} ${day}, ${meta.year} &bull; ${dayName}</div>
                                 ${isToday ? `
                                     <span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-teal-600 text-white uppercase tracking-wider flex items-center gap-1 shadow-2xs">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping"></span>
@@ -684,7 +953,7 @@
                                     </span>
                                 ` : ''}
                             </div>
-                            <div class="text-[10px] text-slate-500 font-mono mt-0.5">POW Ward &bull; ID: 7269766</div>
+                            <div class="text-[10px] text-slate-500 font-mono mt-0.5">${customWard} &bull; ID: ${doctorInfo.staffId}</div>
                         </div>
                     </div>
                     <div>
@@ -703,12 +972,20 @@
         // Show details in selected bottom card
         function showDayDetails(day) {
             const container = document.getElementById('selectedDayCard');
-            const shift = DOCTOR_SHIFTS[day] || '';
-            const dayName = DAY_NAMES[day - 1];
+            if (!container) return;
+
+            const shift = currentShifts[day] || '';
+            const meta = getMonthMeta(activeMonth);
+            const dayName = getWeekdayName(meta.year, meta.monthIdx, day);
+            const todayDate = getTodayDate();
             const isToday = (day === todayDate);
 
+            const customTime = customTimes[day];
+            const customNote = customNotes[day];
+            const customWard = customWards[day] || doctorInfo.ward;
+
             const todayBadge = isToday ? `
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-teal-600 text-white flex items-center gap-1 shadow-xs tracking-wider">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-teal-600 text-white flex items-center gap-1 shadow-xs tracking-wider">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
                     TODAY
                 </span>
@@ -726,14 +1003,15 @@
                                 <div class="flex items-center space-x-2">
                                     ${todayBadge}
                                     <span class="text-xs font-bold text-slate-500">${isToday ? "Today's Schedule:" : "Selected:"}</span>
-                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">October ${day}, 2026 (${dayName})</h4>
+                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">${meta.monthName} ${day}, ${meta.year} (${dayName})</h4>
                                 </div>
-                                <div class="text-xs font-bold text-amber-900 mt-0.5">☀️ Day Shift Duty &bull; 08:00 AM &ndash; 08:00 PM (12 Hours)</div>
+                                <div class="text-xs font-bold text-amber-900 mt-0.5">☀️ Day Shift Duty &bull; ${customTime || '08:00 AM – 08:00 PM'} (12 Hours)</div>
+                                ${customNote ? `<div class="text-[11px] text-amber-800/80 mt-0.5 font-medium">Note: ${customNote}</div>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 text-xs">
                             <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-950 border border-amber-300 font-bold">On Active Duty</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-mono">POW Ward</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-mono">${customWard}</span>
                         </div>
                     </div>
                 `;
@@ -748,14 +1026,15 @@
                                 <div class="flex items-center space-x-2">
                                     ${todayBadge}
                                     <span class="text-xs font-bold text-slate-500">${isToday ? "Today's Schedule:" : "Selected:"}</span>
-                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">October ${day}, 2026 (${dayName})</h4>
+                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">${meta.monthName} ${day}, ${meta.year} (${dayName})</h4>
                                 </div>
-                                <div class="text-xs font-bold text-indigo-900 mt-0.5">🌙 Night Shift Duty &bull; 08:00 PM &ndash; 08:00 AM (Overnight)</div>
+                                <div class="text-xs font-bold text-indigo-900 mt-0.5">🌙 Night Shift Duty &bull; ${customTime || '08:00 PM – 08:00 AM'} (Overnight)</div>
+                                ${customNote ? `<div class="text-[11px] text-indigo-800/80 mt-0.5 font-medium">Note: ${customNote}</div>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 text-xs">
                             <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-950 border border-indigo-300 font-bold">On Active Duty</span>
-                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-mono">POW Ward</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 font-mono">${customWard}</span>
                         </div>
                     </div>
                 `;
@@ -770,9 +1049,10 @@
                                 <div class="flex items-center space-x-2">
                                     ${todayBadge}
                                     <span class="text-xs font-bold text-slate-500">${isToday ? "Today's Schedule:" : "Selected:"}</span>
-                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">October ${day}, 2026 (${dayName})</h4>
+                                    <h4 class="text-sm sm:text-base font-extrabold text-slate-900">${meta.monthName} ${day}, ${meta.year} (${dayName})</h4>
                                 </div>
                                 <div class="text-xs font-bold text-slate-600 mt-0.5">🏖️ Off Duty &bull; Rest &amp; Recovery Day</div>
+                                ${customNote ? `<div class="text-[11px] text-slate-500 mt-0.5 font-medium">Note: ${customNote}</div>` : ''}
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 text-xs">
@@ -787,14 +1067,20 @@
 
         function openDayModal(day) {
             const modal = document.getElementById('dayModal');
-            const shift = DOCTOR_SHIFTS[day] || '';
-            const dayName = DAY_NAMES[day - 1];
+            const shift = currentShifts[day] || '';
+            const meta = getMonthMeta(activeMonth);
+            const dayName = getWeekdayName(meta.year, meta.monthIdx, day);
+            const todayDate = getTodayDate();
             const isToday = (day === todayDate);
 
+            const customTime = customTimes[day];
+            const customNote = customNotes[day];
+            const customWard = customWards[day] || doctorInfo.ward;
+
             document.getElementById('modalDateBadge').textContent = isToday
-                ? `Today • October ${day}, 2026 (${dayName})`
-                : `October ${day}, 2026 (${dayName})`;
-            document.getElementById('modalDayTitle').textContent = `Dr. Afroza Supti`;
+                ? `Today • ${meta.monthName} ${day}, ${meta.year} (${dayName})`
+                : `${meta.monthName} ${day}, ${meta.year} (${dayName})`;
+            document.getElementById('modalDayTitle').textContent = doctorInfo.name;
 
             let bodyHtml = '';
             if (shift === 'D') {
@@ -803,13 +1089,14 @@
                         <div class="w-10 h-10 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center font-black text-xl">☀️</div>
                         <div>
                             <div class="font-extrabold text-amber-950">Day Shift (D)</div>
-                            <div class="text-xs text-amber-800 font-mono mt-0.5">08:00 AM &ndash; 08:00 PM</div>
+                            <div class="text-xs text-amber-800 font-mono mt-0.5">${customTime || '08:00 AM – 08:00 PM'}</div>
                         </div>
                     </div>
                     <div class="space-y-1 text-xs text-slate-600 mt-2">
-                        <div><strong>Ward:</strong> Post-Operative Ward (POW)</div>
-                        <div><strong>Duration:</strong> 12 Hours Duty</div>
-                        <div><strong>Employee ID:</strong> 7269766</div>
+                        <div><strong>Ward:</strong> ${customWard}</div>
+                        <div><strong>Duration:</strong> 12 Hours Day Duty</div>
+                        <div><strong>Employee ID:</strong> ${doctorInfo.staffId}</div>
+                        ${customNote ? `<div class="pt-1 text-slate-700"><strong>Note:</strong> ${customNote}</div>` : ''}
                     </div>
                 `;
             } else if (shift === 'N') {
@@ -818,13 +1105,14 @@
                         <div class="w-10 h-10 rounded-full bg-indigo-200 text-indigo-900 flex items-center justify-center font-black text-xl">🌙</div>
                         <div>
                             <div class="font-extrabold text-indigo-950">Night Shift (N)</div>
-                            <div class="text-xs text-indigo-800 font-mono mt-0.5">08:00 PM &ndash; 08:00 AM</div>
+                            <div class="text-xs text-indigo-800 font-mono mt-0.5">${customTime || '08:00 PM – 08:00 AM'}</div>
                         </div>
                     </div>
                     <div class="space-y-1 text-xs text-slate-600 mt-2">
-                        <div><strong>Ward:</strong> Post-Operative Ward (POW)</div>
+                        <div><strong>Ward:</strong> ${customWard}</div>
                         <div><strong>Duration:</strong> 12 Hours Overnight Duty</div>
-                        <div><strong>Employee ID:</strong> 7269766</div>
+                        <div><strong>Employee ID:</strong> ${doctorInfo.staffId}</div>
+                        ${customNote ? `<div class="pt-1 text-slate-700"><strong>Note:</strong> ${customNote}</div>` : ''}
                     </div>
                 `;
             } else {
@@ -837,7 +1125,8 @@
                         </div>
                     </div>
                     <div class="space-y-1 text-xs text-slate-600 mt-2">
-                        <div><strong>Status:</strong> No clinical duty assigned today.</div>
+                        <div><strong>Status:</strong> No clinical duty scheduled today.</div>
+                        ${customNote ? `<div class="pt-1 text-slate-700"><strong>Note:</strong> ${customNote}</div>` : ''}
                     </div>
                 `;
             }
@@ -846,9 +1135,284 @@
             modal.classList.remove('hidden');
         }
 
-        function closeModal() {
-            document.getElementById('dayModal').classList.add('hidden');
+        // --- Google Sheet Data Fetcher and Smart Parser ---
+
+        async function fetchGoogleSheet(sheetName = null) {
+            let url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+            if (sheetName) {
+                url += `&sheet=${encodeURIComponent(sheetName)}`;
+            }
+            // Cache buster parameter so edits in Google Sheets reflect instantly
+            url += `&_t=${Date.now()}`;
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+            const text = await response.text();
+            const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+            if (!match) throw new Error("Invalid GViz format");
+            return JSON.parse(match[1]);
         }
+
+        function parseGoogleSheetData(gvizResponse, targetMonth = 'October 2026') {
+            const table = gvizResponse.table || {};
+            const cols = table.cols || [];
+            const rawRows = table.rows || [];
+
+            if (!rawRows || rawRows.length === 0) {
+                return { empty: true };
+            }
+
+            // Convert to 2D array of string values
+            const grid = rawRows.map(r => {
+                return (r.c || []).map(cell => {
+                    if (!cell) return '';
+                    if (cell.v !== undefined && cell.v !== null) return String(cell.v).trim();
+                    if (cell.f !== undefined && cell.f !== null) return String(cell.f).trim();
+                    return '';
+                });
+            });
+
+            // Find header columns
+            let headerRow = cols.map(c => (c.label || '').toLowerCase().trim());
+            let dataStartIdx = 0;
+
+            const hasColLabels = headerRow.some(l => l.includes('date') || l.includes('shift') || l.includes('day'));
+            if (!hasColLabels) {
+                let foundHeader = false;
+                for (let i = 0; i < Math.min(grid.length, 5); i++) {
+                    const rowLower = grid[i].map(v => v.toLowerCase());
+                    if (rowLower.some(v => v.includes('date') || v.includes('shift') || v.includes('day'))) {
+                        headerRow = rowLower;
+                        dataStartIdx = i + 1;
+                        foundHeader = true;
+                        break;
+                    }
+                }
+                if (!foundHeader) {
+                    headerRow = ['date', 'day', 'shift', 'shift name', 'time', 'ward', 'doctor', 'id', 'month', 'notes'];
+                    dataStartIdx = 0;
+                }
+            }
+
+            const colMap = {
+                date: -1, day: -1, shift: -1, shiftName: -1, time: -1,
+                ward: -1, doctor: -1, staffId: -1, month: -1, notes: -1
+            };
+
+            headerRow.forEach((h, idx) => {
+                h = h.toLowerCase().trim();
+                if (colMap.date === -1 && (h === 'date' || h.includes('date') || (h.includes('day') && !h.includes('name') && !h.includes('shift')))) colMap.date = idx;
+                if (colMap.day === -1 && (h.includes('weekday') || h.includes('day name') || (h.includes('day') && !h.includes('shift') && !h.includes('date')))) colMap.day = idx;
+                if (colMap.shiftName === -1 && (h.includes('shift name') || h.includes('shift_name') || h.includes('title'))) colMap.shiftName = idx;
+                if (colMap.shift === -1 && (h === 'shift' || h.includes('shift') || h.includes('duty') || h.includes('type')) && !h.includes('name')) colMap.shift = idx;
+                if (colMap.time === -1 && (h.includes('time') || h.includes('hour'))) colMap.time = idx;
+                if (colMap.ward === -1 && (h.includes('ward') || h.includes('dept') || h.includes('department'))) colMap.ward = idx;
+                if (colMap.doctor === -1 && (h.includes('doctor') || h.includes('physician') || (h.includes('name') && !h.includes('shift') && !h.includes('day')))) colMap.doctor = idx;
+                if (colMap.staffId === -1 && (h.includes('staff') || h.includes('id') || h.includes('emp'))) colMap.staffId = idx;
+                if (colMap.month === -1 && (h.includes('month') || h.includes('year'))) colMap.month = idx;
+                if (colMap.notes === -1 && (h.includes('note') || h.includes('remark') || h.includes('status'))) colMap.notes = idx;
+            });
+
+            if (colMap.date === -1) colMap.date = 0;
+            if (colMap.shift === -1) colMap.shift = Math.min(2, headerRow.length - 1);
+
+            const shifts = {};
+            const times = {};
+            const notes = {};
+            const wards = {};
+            const discoveredMonths = new Set();
+            let parsedDoctor = '';
+            let parsedStaffId = '';
+            let parsedWard = '';
+
+            for (let r = dataStartIdx; r < grid.length; r++) {
+                const row = grid[r];
+                if (!row || row.length === 0 || row.every(c => c === '')) continue;
+
+                const rowMonth = (colMap.month !== -1 && row[colMap.month]) ? row[colMap.month].trim() : '';
+                if (rowMonth) {
+                    discoveredMonths.add(rowMonth);
+                    if (targetMonth && rowMonth.toLowerCase() !== targetMonth.toLowerCase()) {
+                        continue;
+                    }
+                }
+
+                const dateVal = parseInt(row[colMap.date], 10);
+                if (isNaN(dateVal) || dateVal < 1 || dateVal > 31) continue;
+
+                const rawShift = (colMap.shift !== -1 && row[colMap.shift]) ? row[colMap.shift].trim().toUpperCase() : '';
+                let normShift = '';
+                if (rawShift === 'D' || rawShift.startsWith('DAY') || rawShift.includes('সকাল')) {
+                    normShift = 'D';
+                } else if (rawShift === 'N' || rawShift.startsWith('NIGHT') || rawShift.includes('রাত')) {
+                    normShift = 'N';
+                } else {
+                    normShift = ''; // OFF
+                }
+
+                shifts[dateVal] = normShift;
+
+                if (colMap.time !== -1 && row[colMap.time]) times[dateVal] = row[colMap.time].trim();
+                if (colMap.notes !== -1 && row[colMap.notes]) notes[dateVal] = row[colMap.notes].trim();
+                if (colMap.ward !== -1 && row[colMap.ward]) wards[dateVal] = row[colMap.ward].trim();
+
+                if (!parsedDoctor && colMap.doctor !== -1 && row[colMap.doctor]) parsedDoctor = row[colMap.doctor].trim();
+                if (!parsedStaffId && colMap.staffId !== -1 && row[colMap.staffId]) parsedStaffId = row[colMap.staffId].trim();
+                if (!parsedWard && colMap.ward !== -1 && row[colMap.ward]) parsedWard = row[colMap.ward].trim();
+            }
+
+            return {
+                empty: Object.keys(shifts).length === 0,
+                shifts,
+                times,
+                notes,
+                wards,
+                discoveredMonths: Array.from(discoveredMonths),
+                doctorName: parsedDoctor,
+                staffId: parsedStaffId,
+                ward: parsedWard
+            };
+        }
+
+        // Main Sheet Synchronization Function
+        async function refreshSheetData(userInitiated = false) {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            const spinner = document.getElementById('syncSpinner');
+            const dot = document.getElementById('syncStatusDot');
+            const badge = document.getElementById('syncStatusBadge');
+            const updatedEl = document.getElementById('syncLastUpdated');
+
+            if (spinner) spinner.classList.add('animate-spin');
+            if (badge) badge.textContent = 'Syncing...';
+
+            try {
+                // Try fetching sheet tab for activeMonth first, fallback to default tab
+                let gvizData = null;
+                try {
+                    gvizData = await fetchGoogleSheet(activeMonth);
+                    if (!gvizData.table || !gvizData.table.rows || gvizData.table.rows.length === 0) {
+                        // If specific tab is empty, try default sheet
+                        gvizData = await fetchGoogleSheet(null);
+                    }
+                } catch (tabErr) {
+                    gvizData = await fetchGoogleSheet(null);
+                }
+
+                const parsed = parseGoogleSheetData(gvizData, activeMonth);
+
+                if (parsed.empty) {
+                    // Google sheet is currently empty
+                    if (dot) dot.className = 'w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0';
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200';
+                        badge.textContent = 'Sheet Ready';
+                    }
+                    if (updatedEl) {
+                        updatedEl.innerHTML = `Connected &bull; Sheet is empty (showing demo). <button onclick="openSetupModal()" class="text-teal-700 font-bold underline cursor-pointer">Paste data</button>`;
+                    }
+                    // Keep default shifts
+                    currentShifts = { ...DEFAULT_DOCTOR_SHIFTS };
+                } else {
+                    // Successfully parsed live data from Google Sheets!
+                    currentShifts = parsed.shifts;
+                    customTimes = parsed.times || {};
+                    customNotes = parsed.notes || {};
+                    customWards = parsed.wards || {};
+
+                    if (parsed.doctorName) doctorInfo.name = parsed.doctorName;
+                    if (parsed.staffId) doctorInfo.staffId = parsed.staffId;
+                    if (parsed.ward) doctorInfo.ward = parsed.ward;
+
+                    // Update month dropdown if new months discovered in sheet
+                    if (parsed.discoveredMonths && parsed.discoveredMonths.length > 0) {
+                        parsed.discoveredMonths.forEach(m => {
+                            if (!availableMonths.includes(m)) availableMonths.push(m);
+                        });
+                        populateMonthDropdown();
+                    }
+
+                    lastSyncTime = new Date();
+                    const timeStr = lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+                    if (dot) dot.className = 'w-3 h-3 rounded-full bg-emerald-500 shrink-0';
+                    if (badge) {
+                        badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+                        badge.textContent = 'Live Synced 🟢';
+                    }
+                    if (updatedEl) {
+                        updatedEl.textContent = `Live synced with Google Sheet (${timeStr})`;
+                    }
+                }
+
+                updateUIStats();
+                renderCalendar();
+                renderAgendaList();
+                showDayDetails(currentSelectedDay);
+
+            } catch (err) {
+                console.warn('Google Sheet fetch error:', err);
+                if (dot) dot.className = 'w-3 h-3 rounded-full bg-slate-400 shrink-0';
+                if (badge) {
+                    badge.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200';
+                    badge.textContent = 'Cached';
+                }
+                if (updatedEl) {
+                    updatedEl.textContent = `Using cached data (${err.message || 'Network issue'})`;
+                }
+                updateUIStats();
+                renderCalendar();
+                renderAgendaList();
+                showDayDetails(currentSelectedDay);
+            } finally {
+                isSyncing = false;
+                if (spinner) spinner.classList.remove('animate-spin');
+            }
+        }
+
+        // Change Month function
+        function changeMonth(newMonth) {
+            if (!newMonth || newMonth === activeMonth) return;
+            activeMonth = newMonth;
+            currentSelectedDay = getTodayDate();
+
+            const selectEl = document.getElementById('sheetMonthSelect');
+            if (selectEl && selectEl.value !== activeMonth) selectEl.value = activeMonth;
+
+            refreshSheetData(true);
+        }
+
+        function populateMonthDropdown() {
+            const selectEl = document.getElementById('sheetMonthSelect');
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
+            availableMonths.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                if (m === activeMonth) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            populateMonthDropdown();
+            currentSelectedDay = getTodayDate();
+            updateUIStats();
+            renderCalendar();
+            renderAgendaList();
+            showDayDetails(currentSelectedDay);
+
+            // Fetch live Google Sheet data immediately
+            refreshSheetData(false);
+
+            // Automatic live polling: Checks Google Sheet every 30 seconds for background updates!
+            setInterval(() => {
+                refreshSheetData(false);
+            }, 30000);
+        });
     </script>
 </body>
 
