@@ -108,13 +108,28 @@
     <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
 
         <!-- Google Sheet Live Sync & Month Selector Toolbar -->
-        <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 no-print">
+        <div class="relative bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-xs flex flex-col md:flex-row items-center justify-between gap-3 no-print overflow-hidden">
+            <!-- Animated Progress Bar at bottom of toolbar -->
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-slate-100">
+                <div id="syncProgressBar" class="h-full bg-teal-500 transition-all duration-1000 ease-linear" style="width: 100%;"></div>
+            </div>
+
             <div class="flex items-center space-x-3 w-full md:w-auto">
                 <div id="syncStatusDot" class="w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0"></div>
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-bold text-slate-800" id="syncStatusTitle">Google Sheets Live Sync</span>
                         <span id="syncStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">Connecting...</span>
+                        
+                        <!-- Auto-sync Waiting Countdown Badge -->
+                        <div id="syncCountdownPill" class="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200 transition-all shadow-2xs" title="Auto refreshes from Google Sheet every 30 seconds">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                            </span>
+                            <span class="text-[10px] text-slate-500">Auto sync in:</span>
+                            <span id="countdownTimer" class="font-mono font-black text-teal-700">30s</span>
+                        </div>
                     </div>
                     <p class="text-[11px] text-slate-500 mt-0.5" id="syncLastUpdated">Connecting to Google Sheet...</p>
                 </div>
@@ -132,11 +147,11 @@
                 </div>
 
                 <!-- Sync Now Button -->
-                <button onclick="refreshSheetData(true)" id="btnRefresh" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-xs cursor-pointer">
+                <button onclick="manualSyncTrigger()" id="btnRefresh" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition shadow-xs cursor-pointer active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
                     <svg id="syncSpinner" class="w-3.5 h-3.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Sync Now</span>
+                    <span id="btnSyncText">Sync Now</span>
                 </button>
 
                 <!-- Open Sheet Link -->
@@ -514,11 +529,14 @@
             staffId: '7269766',
             ward: 'POW Ward'
         };
-        let availableMonths = ['October 2026', 'November 2026', 'December 2026'];
+        let availableMonths = ['October 2026'];
         let activeFilter = 'all';
         let currentSelectedDay = 5;
         let isSyncing = false;
         let lastSyncTime = null;
+        const AUTO_SYNC_INTERVAL_SEC = 30;
+        let countdownRemaining = AUTO_SYNC_INTERVAL_SEC;
+        let countdownTimerId = null;
 
         // Modal Controls
         function openSetupModal() {
@@ -550,8 +568,18 @@
         // Calculate dynamic Month details (Days count, first weekday, etc.)
         function getMonthMeta(monthYearString) {
             const months = {
-                'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
-                'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11
+                'january': 0, 'jan': 0, 'jan.': 0,
+                'february': 1, 'feb': 1, 'feb.': 1,
+                'march': 2, 'mar': 2, 'mar.': 2,
+                'april': 3, 'apr': 3, 'apr.': 3,
+                'may': 4,
+                'june': 5, 'jun': 5, 'jun.': 5,
+                'july': 6, 'jul': 6, 'jul.': 6,
+                'august': 7, 'aug': 7, 'aug.': 7,
+                'september': 8, 'sep': 8, 'sep.': 8, 'sept': 8,
+                'october': 9, 'oct': 9, 'oct.': 9,
+                'november': 10, 'nov': 10, 'nov.': 10,
+                'december': 11, 'dec': 11, 'dec.': 11
             };
             const parts = (monthYearString || 'October 2026').trim().split(/\s+/);
             let monthIdx = 9; // Default October
@@ -561,6 +589,9 @@
                 if (months[mName] !== undefined) monthIdx = months[mName];
                 const yNum = parseInt(parts[1], 10);
                 if (!isNaN(yNum)) year = yNum;
+            } else if (parts.length === 1) {
+                const mName = parts[0].toLowerCase();
+                if (months[mName] !== undefined) monthIdx = months[mName];
             }
             const totalDays = new Date(year, monthIdx + 1, 0).getDate();
             const firstDayOfWeek = new Date(year, monthIdx, 1).getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
@@ -1137,23 +1168,89 @@
 
         // --- Google Sheet Data Fetcher and Smart Parser ---
 
-        async function fetchGoogleSheet(sheetName = null) {
-            let url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
-            if (sheetName) {
-                url += `&sheet=${encodeURIComponent(sheetName)}`;
-            }
-            // Cache buster parameter so edits in Google Sheets reflect instantly
-            url += `&_t=${Date.now()}`;
+        function fetchGoogleSheetJSONP(sheetName = null) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'gvizCallback_' + Math.floor(Math.random() * 1000000);
+                let url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=responseHandler:${callbackName}`;
+                if (sheetName) {
+                    url += `&sheet=${encodeURIComponent(sheetName)}`;
+                }
+                url += `&_t=${Date.now()}`;
 
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
-            const text = await response.text();
-            const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
-            if (!match) throw new Error("Invalid GViz format");
-            return JSON.parse(match[1]);
+                const script = document.createElement('script');
+                script.src = url;
+                script.async = true;
+
+                const timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Google Sheet sync timed out'));
+                }, 12000);
+
+                function cleanup() {
+                    clearTimeout(timeout);
+                    try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+                    if (script.parentNode) script.parentNode.removeChild(script);
+                }
+
+                window[callbackName] = function(response) {
+                    cleanup();
+                    if (response && response.status === 'error') {
+                        const errMsg = (response.errors && response.errors[0]) ? response.errors[0].message : 'Sheet error';
+                        reject(new Error(errMsg));
+                    } else {
+                        resolve(response);
+                    }
+                };
+
+                script.onerror = function() {
+                    cleanup();
+                    reject(new Error('Network error loading Google Sheet'));
+                };
+
+                document.head.appendChild(script);
+            });
         }
 
-        function parseGoogleSheetData(gvizResponse, targetMonth = 'October 2026') {
+        async function fetchGoogleSheet(sheetName = null) {
+            // Primary: JSONP (Bypasses browser CORS restrictions on all origins including file:// and localhost)
+            try {
+                return await fetchGoogleSheetJSONP(sheetName);
+            } catch (jsonpErr) {
+                console.warn('JSONP fetch failed, falling back to direct fetch:', jsonpErr);
+                let url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+                if (sheetName) {
+                    url += `&sheet=${encodeURIComponent(sheetName)}`;
+                }
+                url += `&_t=${Date.now()}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+                const text = await response.text();
+                const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\);/s);
+                if (!match) throw new Error("Invalid GViz format");
+                return JSON.parse(match[1]);
+            }
+        }
+
+        function normalizeMonthString(val) {
+            if (!val) return '';
+            val = String(val).trim();
+            const dateMatch = val.match(/Date\((\d+),\s*(\d+)/i);
+            if (dateMatch) {
+                const year = dateMatch[1];
+                const monthIndex = parseInt(dateMatch[2], 10);
+                const monthNames = [
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
+                ];
+                if (monthIndex >= 0 && monthIndex < 12) {
+                    return `${monthNames[monthIndex]} ${year}`;
+                }
+            }
+            return val;
+        }
+
+        function parseGoogleSheetData(gvizResponse, targetMonth = 'October 2026', isSpecificTab = false) {
             const table = gvizResponse.table || {};
             const cols = table.cols || [];
             const rawRows = table.rows || [];
@@ -1162,12 +1259,16 @@
                 return { empty: true };
             }
 
-            // Convert to 2D array of string values
+            // Convert to 2D array of string values (Prefer formatted string cell.f if present)
             const grid = rawRows.map(r => {
                 return (r.c || []).map(cell => {
                     if (!cell) return '';
-                    if (cell.v !== undefined && cell.v !== null) return String(cell.v).trim();
-                    if (cell.f !== undefined && cell.f !== null) return String(cell.f).trim();
+                    if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== '') {
+                        return String(cell.f).trim();
+                    }
+                    if (cell.v !== undefined && cell.v !== null) {
+                        return String(cell.v).trim();
+                    }
                     return '';
                 });
             });
@@ -1229,11 +1330,19 @@
                 const row = grid[r];
                 if (!row || row.length === 0 || row.every(c => c === '')) continue;
 
-                const rowMonth = (colMap.month !== -1 && row[colMap.month]) ? row[colMap.month].trim() : '';
-                if (rowMonth) {
-                    discoveredMonths.add(rowMonth);
-                    if (targetMonth && rowMonth.toLowerCase() !== targetMonth.toLowerCase()) {
-                        continue;
+                const rawRowMonth = (colMap.month !== -1 && row[colMap.month]) ? row[colMap.month].trim() : '';
+                const normRowMonth = normalizeMonthString(rawRowMonth);
+                const normTargetMonth = normalizeMonthString(targetMonth);
+
+                if (normRowMonth) {
+                    discoveredMonths.add(normRowMonth);
+                    // Only filter by rowMonth if we are querying the default sheet (not a specific month tab)
+                    if (normTargetMonth && !isSpecificTab) {
+                        const rLow = normRowMonth.toLowerCase();
+                        const tLow = normTargetMonth.toLowerCase();
+                        if (!rLow.includes(tLow) && !tLow.includes(rLow)) {
+                            continue;
+                        }
                     }
                 }
 
@@ -1274,6 +1383,60 @@
             };
         }
 
+        // --- Google Sheet Countdown & Synchronization Manager ---
+
+        function updateCountdownUI() {
+            const timerEl = document.getElementById('countdownTimer');
+            const progressEl = document.getElementById('syncProgressBar');
+
+            if (timerEl) {
+                if (isSyncing) {
+                    timerEl.textContent = '...';
+                } else {
+                    timerEl.textContent = `${countdownRemaining}s`;
+                }
+            }
+
+            if (progressEl) {
+                if (isSyncing) {
+                    progressEl.style.width = '100%';
+                    progressEl.classList.add('animate-pulse');
+                } else {
+                    progressEl.classList.remove('animate-pulse');
+                    const percent = Math.max(0, Math.min(100, (countdownRemaining / AUTO_SYNC_INTERVAL_SEC) * 100));
+                    progressEl.style.width = `${percent}%`;
+                }
+            }
+        }
+
+        function resetCountdown() {
+            countdownRemaining = AUTO_SYNC_INTERVAL_SEC;
+            updateCountdownUI();
+        }
+
+        function startAutoSyncCountdown() {
+            if (countdownTimerId) clearInterval(countdownTimerId);
+            countdownRemaining = AUTO_SYNC_INTERVAL_SEC;
+            updateCountdownUI();
+
+            countdownTimerId = setInterval(() => {
+                if (!isSyncing) {
+                    countdownRemaining--;
+                    if (countdownRemaining <= 0) {
+                        resetCountdown();
+                        refreshSheetData(false);
+                    } else {
+                        updateCountdownUI();
+                    }
+                }
+            }, 1000);
+        }
+
+        function manualSyncTrigger() {
+            resetCountdown();
+            refreshSheetData(true);
+        }
+
         // Main Sheet Synchronization Function
         async function refreshSheetData(userInitiated = false) {
             if (isSyncing) return;
@@ -1283,24 +1446,34 @@
             const dot = document.getElementById('syncStatusDot');
             const badge = document.getElementById('syncStatusBadge');
             const updatedEl = document.getElementById('syncLastUpdated');
+            const btnRefresh = document.getElementById('btnRefresh');
+            const btnSyncText = document.getElementById('btnSyncText');
 
             if (spinner) spinner.classList.add('animate-spin');
             if (badge) badge.textContent = 'Syncing...';
+            if (btnSyncText) btnSyncText.textContent = 'Syncing...';
+            if (btnRefresh) btnRefresh.disabled = true;
+            updateCountdownUI();
 
             try {
                 // Try fetching sheet tab for activeMonth first, fallback to default tab
                 let gvizData = null;
+                let isSpecificTab = false;
                 try {
                     gvizData = await fetchGoogleSheet(activeMonth);
                     if (!gvizData.table || !gvizData.table.rows || gvizData.table.rows.length === 0) {
                         // If specific tab is empty, try default sheet
                         gvizData = await fetchGoogleSheet(null);
+                        isSpecificTab = false;
+                    } else {
+                        isSpecificTab = true;
                     }
                 } catch (tabErr) {
                     gvizData = await fetchGoogleSheet(null);
+                    isSpecificTab = false;
                 }
 
-                const parsed = parseGoogleSheetData(gvizData, activeMonth);
+                const parsed = parseGoogleSheetData(gvizData, activeMonth, isSpecificTab);
 
                 if (parsed.empty) {
                     // Google sheet is currently empty
@@ -1342,7 +1515,7 @@
                         badge.textContent = 'Live Synced 🟢';
                     }
                     if (updatedEl) {
-                        updatedEl.textContent = `Live synced with Google Sheet (${timeStr})`;
+                        updatedEl.textContent = `Live synced with Google Sheet (${activeMonth}) (${timeStr})`;
                     }
                 }
 
@@ -1368,11 +1541,87 @@
             } finally {
                 isSyncing = false;
                 if (spinner) spinner.classList.remove('animate-spin');
+                if (btnSyncText) btnSyncText.textContent = 'Sync Now';
+                if (btnRefresh) btnRefresh.disabled = false;
+                resetCountdown();
+            }
+        }
+
+        // Dynamically probe and discover all existing tabs in Google Sheets
+        async function discoverSheetTabs() {
+            try {
+                const defaultGviz = await fetchGoogleSheet(null);
+                if (!defaultGviz || !defaultGviz.table || !defaultGviz.table.rows) return;
+
+                const defaultSig = defaultGviz.sig;
+                const defaultRowCount = defaultGviz.table.rows.length;
+                const defaultDay1 = defaultGviz.table.rows[0].c && defaultGviz.table.rows[0].c[1]
+                    ? (defaultGviz.table.rows[0].c[1].f || defaultGviz.table.rows[0].c[1].v) : '';
+
+                // Candidate months to check in Google Sheet
+                const candidateMonths = [
+                    'October 2026', 'November 2026', 'December 2026',
+                    'January 2027', 'February 2027', 'March 2027',
+                    'April 2027', 'May 2027', 'June 2027',
+                    'Nov. 2026', 'Nov 2026', 'Dec. 2026', 'Dec 2026',
+                    'Oct 2026', 'Oct. 2026'
+                ];
+
+                const existingTabs = ['October 2026'];
+
+                const probePromises = candidateMonths
+                    .filter(c => c !== 'October 2026')
+                    .map(async (sheetName) => {
+                        try {
+                            const res = await fetchGoogleSheet(sheetName);
+                            if (res && res.table && res.table.rows && res.table.rows.length > 0) {
+                                const rRowCount = res.table.rows.length;
+                                const rDay1 = res.table.rows[0].c && res.table.rows[0].c[1]
+                                    ? (res.table.rows[0].c[1].f || res.table.rows[0].c[1].v) : '';
+                                
+                                const isFallback = (res.sig === defaultSig && rRowCount === defaultRowCount && rDay1 === defaultDay1);
+                                if (!isFallback) {
+                                    return sheetName;
+                                }
+                            }
+                        } catch (e) {}
+                        return null;
+                    });
+
+                const probeResults = await Promise.all(probePromises);
+                probeResults.forEach(name => {
+                    if (name && !existingTabs.includes(name)) {
+                        existingTabs.push(name);
+                    }
+                });
+
+                availableMonths = existingTabs;
+                populateMonthDropdown();
+
+            } catch (err) {
+                console.warn('Error discovering sheet tabs:', err);
             }
         }
 
         // Change Month function
         function changeMonth(newMonth) {
+            if (newMonth === '__ADD_CUSTOM__') {
+                const customName = prompt("গুগল শিটের নতুন ট্যাবের নাম লিখুন (যেমন: Nov. 2026 বা December 2026):");
+                if (customName && customName.trim()) {
+                    const cleanName = customName.trim();
+                    if (!availableMonths.includes(cleanName)) {
+                        availableMonths.push(cleanName);
+                    }
+                    activeMonth = cleanName;
+                    currentSelectedDay = getTodayDate();
+                    populateMonthDropdown();
+                    manualSyncTrigger();
+                } else {
+                    populateMonthDropdown();
+                }
+                return;
+            }
+
             if (!newMonth || newMonth === activeMonth) return;
             activeMonth = newMonth;
             currentSelectedDay = getTodayDate();
@@ -1380,7 +1629,7 @@
             const selectEl = document.getElementById('sheetMonthSelect');
             if (selectEl && selectEl.value !== activeMonth) selectEl.value = activeMonth;
 
-            refreshSheetData(true);
+            manualSyncTrigger();
         }
 
         function populateMonthDropdown() {
@@ -1394,6 +1643,12 @@
                 if (m === activeMonth) opt.selected = true;
                 selectEl.appendChild(opt);
             });
+
+            // Option to add/switch to custom tab name created in Google Sheet
+            const addOpt = document.createElement('option');
+            addOpt.value = '__ADD_CUSTOM__';
+            addOpt.textContent = '➕ Add / Open Tab...';
+            selectEl.appendChild(addOpt);
         }
 
         // Initialize on page load
@@ -1408,10 +1663,11 @@
             // Fetch live Google Sheet data immediately
             refreshSheetData(false);
 
-            // Automatic live polling: Checks Google Sheet every 30 seconds for background updates!
-            setInterval(() => {
-                refreshSheetData(false);
-            }, 30000);
+            // Dynamically discover all tabs present in Google Sheets
+            discoverSheetTabs();
+
+            // Start 30s auto-sync countdown with live UI ticker
+            startAutoSyncCountdown();
         });
     </script>
 </body>
