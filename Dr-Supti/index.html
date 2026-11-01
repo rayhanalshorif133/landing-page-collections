@@ -140,9 +140,7 @@
                 <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl">
                     <span class="text-[10px] font-bold uppercase text-slate-500 pl-2">Month:</span>
                     <select id="sheetMonthSelect" onchange="changeMonth(this.value)" class="bg-white border border-slate-200 text-slate-800 font-bold text-xs rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-teal-500 outline-none cursor-pointer">
-                        <option value="October 2026">October 2026</option>
                         <option value="November 2026">November 2026</option>
-                        <option value="December 2026">December 2026</option>
                     </select>
                 </div>
 
@@ -397,23 +395,39 @@
                 </p>
 
                 <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 space-y-2">
-                    <div class="font-extrabold text-emerald-950 text-sm">⚡ মাত্র ১ ক্লিকে শিট সাজিয়ে ফেলুন:</div>
-                    <ol class="list-decimal list-inside space-y-1.5 text-emerald-900">
-                        <li>নিচের <strong>"Copy All Data (TSV)"</strong> বাটনে ক্লিক করুন।</li>
-                        <li>গুগল শিটটি ওপেন করে প্রথম সেল <strong>A1</strong>-এ ক্লিক করুন।</li>
-                        <li>কিবোর্ড থেকে <strong>Ctrl + V</strong> (Paste) চাপুন।</li>
-                        <li>এরপর এই পেজের <strong>"Sync Now"</strong> বাটনে ক্লিক করলেই লাইভ শিডিউল চলে আসবে!</li>
+                    <div class="font-extrabold text-emerald-950 text-sm">⚡ মাত্র ১ ক্লিকে শিটের যেকোনো মাস সাজিয়ে ফেলুন:</div>
+                    <ol class="list-decimal list-inside space-y-1 text-emerald-900">
+                        <li>নিচের যেকোনো মাসের <strong>"Copy"</strong> বাটনে ক্লিক করুন।</li>
+                        <li>গুগল শিটে নতুন ট্যাব খুলে <strong>A1</strong> সেলে <strong>Ctrl + V</strong> (Paste) চাপুন।</li>
+                        <li>অথবা <code>AppsScript_AutoSetup.js</code> চালালে <strong>Nov, Dec, Jan, Feb</strong> একসাথে তৈরি হয়ে যাবে!</li>
                     </ol>
                 </div>
 
-                <div class="flex items-center gap-2 pt-1">
-                    <button onclick="copyTsvData()" id="btnCopyTsv" class="flex-1 py-2 px-3 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                <!-- 1-Click Copy Buttons for Months -->
+                <div class="space-y-1.5 pt-1">
+                    <span class="text-[11px] font-bold text-slate-700">📋 যেকোনো মাসের ফর্মুলাসহ ডাটা কপি করুন:</span>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        <button onclick="copyTsvData('November 2026')" class="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs transition text-center shadow-xs cursor-pointer">
+                            📋 Nov 2026
+                        </button>
+                        <button onclick="copyTsvData('December 2026')" class="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs transition text-center shadow-xs cursor-pointer">
+                            📋 Dec 2026
+                        </button>
+                        <button onclick="copyTsvData('January 2027')" class="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs transition text-center shadow-xs cursor-pointer">
+                            📋 Jan 2027
+                        </button>
+                        <button onclick="copyTsvData('February 2027')" class="py-1.5 px-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-bold text-xs transition text-center shadow-xs cursor-pointer">
+                            📋 Feb 2027
+                        </button>
+                    </div>
+                    <p id="copyTsvText" class="text-[11px] text-teal-700 font-bold text-center h-4"></p>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <a href="https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit?usp=sharing" target="_blank" class="w-full py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition border border-slate-200 flex items-center justify-center gap-1.5 shadow-xs">
+                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                         </svg>
-                        <span id="copyTsvText">📋 Copy All Data (TSV)</span>
-                    </button>
-                    <a href="https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit?usp=sharing" target="_blank" class="py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs transition border border-slate-200 flex items-center gap-1">
                         <span>🔗 Open Google Sheet</span>
                     </a>
                 </div>
@@ -475,6 +489,48 @@
         // Google Sheet Configuration
         const SPREADSHEET_ID = '11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY';
 
+        const ALL_MONTH_NAMES = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        function getCurrentMonthString() {
+            const now = new Date();
+            const m = ALL_MONTH_NAMES[now.getMonth()];
+            const y = now.getFullYear();
+            return `${m} ${y}`;
+        }
+
+        function generateMonthTsv(year, monthNum, monthTitle, totalDays) {
+            const headers = ["Date", "Day", "Shift", "Shift Name", "Time", "Ward", "Doctor Name", "Staff ID", "Month", "Notes"];
+            const rows = [headers.join('\t')];
+            const defaultShifts = ['D', 'N', 'OFF', 'OFF', 'D', 'D', 'N', 'OFF', 'OFF', 'D', 'N', 'OFF'];
+
+            for (let day = 1; day <= totalDays; day++) {
+                const rowNum = day + 1;
+                const shift = defaultShifts[(day - 1) % defaultShifts.length];
+                const dayFormula = `=TEXT(DATE(${year}, ${monthNum}, A${rowNum}), "dddd")`;
+                const nameFormula = `=IF(C${rowNum}="D", "Day Shift (☀️)", IF(C${rowNum}="N", "Night Shift (🌙)", "Off Duty (🏖️)"))`;
+                const timeFormula = `=IF(C${rowNum}="D", "08:00 - 20:00", IF(C${rowNum}="N", "20:00 - 08:00", "-"))`;
+                const notesFormula = `=IF(C${rowNum}="D", "12 Hours Day Duty", IF(C${rowNum}="N", "12 Hours Overnight Duty", "Rest Day"))`;
+
+                rows.push([
+                    day,
+                    dayFormula,
+                    shift,
+                    nameFormula,
+                    timeFormula,
+                    "POW Ward",
+                    "Dr. Afroza Supti",
+                    "7269766",
+                    monthTitle,
+                    notesFormula
+                ].join('\t'));
+            }
+            return rows.join('\n');
+        }
+
+
         // Default shifts for Dr. Afroza Supti (October 2026) as baseline fallback
         const DEFAULT_DOCTOR_SHIFTS = {
             1: 'D', 2: '', 3: '', 4: 'D', 5: 'N', 6: '', 7: 'D', 8: 'D',
@@ -519,7 +575,8 @@
 31\t=TEXT(DATE(2026, 10, A32), "dddd")\tOFF\t=IF(C32="D", "Day Shift (☀️)", IF(C32="N", "Night Shift (🌙)", "Off Duty (🏖️)"))\t=IF(C32="D", "08:00 - 20:00", IF(C32="N", "20:00 - 08:00", "-"))\tPOW Ward\tDr. Afroza Supti\t7269766\tOctober 2026\t=IF(C32="D", "12 Hours Day Duty", IF(C32="N", "12 Hours Overnight Duty", "Rest Day"))`;
 
         // State variables
-        let activeMonth = 'October 2026';
+        let userSelectedMonth = false; // Tracks if user manually chose a month
+        let activeMonth = getCurrentMonthString(); // Always defaults to current month
         let currentShifts = { ...DEFAULT_DOCTOR_SHIFTS };
         let customTimes = {};
         let customNotes = {};
@@ -529,9 +586,9 @@
             staffId: '7269766',
             ward: 'POW Ward'
         };
-        let availableMonths = ['October 2026'];
+        let availableMonths = [getCurrentMonthString()];
         let activeFilter = 'all';
-        let currentSelectedDay = 5;
+        let currentSelectedDay = (new Date()).getDate();
         let isSyncing = false;
         let lastSyncTime = null;
         const AUTO_SYNC_INTERVAL_SEC = 30;
@@ -551,17 +608,21 @@
             document.getElementById('setupModal').classList.add('hidden');
         }
 
-        function copyTsvData() {
-            navigator.clipboard.writeText(TSV_INITIAL_DATA).then(() => {
+        function copyTsvData(targetMonth = null) {
+            const m = targetMonth || activeMonth || getCurrentMonthString();
+            const meta = getMonthMeta(m);
+            const tsvContent = generateMonthTsv(meta.year, meta.monthIdx + 1, m, meta.totalDays);
+
+            navigator.clipboard.writeText(tsvContent).then(() => {
                 const btnText = document.getElementById('copyTsvText');
-                const originalText = btnText.textContent;
-                btnText.textContent = 'Copied to Clipboard! ✅';
+                const originalText = btnText ? btnText.textContent : '';
+                if (btnText) btnText.textContent = `Copied ${m}! ✅`;
                 setTimeout(() => {
-                    btnText.textContent = originalText;
+                    if (btnText) btnText.textContent = originalText;
                 }, 3000);
             }).catch(err => {
                 console.error('Copy failed:', err);
-                alert('Could not copy automatically. Please open Dr_Supti_Duty_Schedule_October_2026.tsv to copy.');
+                alert(`Could not copy automatically. Please open the TSV template file for ${m}.`);
             });
         }
 
@@ -617,8 +678,7 @@
             if (now.getFullYear() === meta.year && now.getMonth() === meta.monthIdx) {
                 return now.getDate();
             }
-            // If viewing October 2026, default to 5
-            return (meta.year === 2026 && meta.monthIdx === 9) ? 5 : 1;
+            return 1;
         }
 
         // KPI calculation based on current shifts
@@ -1232,6 +1292,73 @@
             }
         }
 
+        function getExpectedMonthInfo(monthStr) {
+            const parts = (monthStr || '').trim().split(/\s+/);
+            const mName = parts[0].toLowerCase().replace('.', '');
+            const year = parseInt(parts[1], 10) || 2026;
+            const monthMap = {
+                'january': 0, 'jan': 0,
+                'february': 1, 'feb': 1,
+                'march': 2, 'mar': 2,
+                'april': 3, 'apr': 3,
+                'may': 4,
+                'june': 5, 'jun': 5,
+                'july': 6, 'jul': 6,
+                'august': 7, 'aug': 7,
+                'september': 8, 'sep': 8, 'sept': 8,
+                'october': 9, 'oct': 9,
+                'november': 10, 'nov': 10,
+                'december': 11, 'dec': 11
+            };
+            const mIdx = monthMap[mName];
+            if (mIdx === undefined) return null;
+            const totalDays = new Date(year, mIdx + 1, 0).getDate();
+            const day1Date = new Date(year, mIdx, 1);
+            const day1Weekday = day1Date.toLocaleDateString('en-US', { weekday: 'long' });
+            const canonicalName = `${ALL_MONTH_NAMES[mIdx]} ${year}`;
+            return { year, mIdx, totalDays, day1Weekday, canonicalName };
+        }
+
+        function isResponseMatchingMonth(gvizData, monthName) {
+            if (!gvizData || !gvizData.table || !gvizData.table.rows || gvizData.table.rows.length === 0) {
+                return false;
+            }
+            const exp = getExpectedMonthInfo(monthName);
+            if (!exp) return true;
+            const day1Cell = gvizData.table.rows[0].c && gvizData.table.rows[0].c[1]
+                ? String(gvizData.table.rows[0].c[1].f || gvizData.table.rows[0].c[1].v || '').trim()
+                : '';
+            if (day1Cell && exp.day1Weekday) {
+                if (day1Cell.toLowerCase() !== exp.day1Weekday.toLowerCase()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function detectMonthFromData(gvizData) {
+            if (!gvizData || !gvizData.table || !gvizData.table.rows || gvizData.table.rows.length === 0) {
+                return null;
+            }
+            const rowCount = gvizData.table.rows.length;
+            const day1Cell = gvizData.table.rows[0].c && gvizData.table.rows[0].c[1]
+                ? String(gvizData.table.rows[0].c[1].f || gvizData.table.rows[0].c[1].v || '').trim()
+                : '';
+
+            const candidates = [];
+            [2026, 2027].forEach(y => {
+                ALL_MONTH_NAMES.forEach(m => candidates.push(`${m} ${y}`));
+            });
+
+            for (const c of candidates) {
+                const exp = getExpectedMonthInfo(c);
+                if (exp && exp.totalDays === rowCount && exp.day1Weekday.toLowerCase() === day1Cell.toLowerCase()) {
+                    return exp.canonicalName;
+                }
+            }
+            return null;
+        }
+
         function normalizeMonthString(val) {
             if (!val) return '';
             val = String(val).trim();
@@ -1239,18 +1366,14 @@
             if (dateMatch) {
                 const year = dateMatch[1];
                 const monthIndex = parseInt(dateMatch[2], 10);
-                const monthNames = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
-                ];
                 if (monthIndex >= 0 && monthIndex < 12) {
-                    return `${monthNames[monthIndex]} ${year}`;
+                    return `${ALL_MONTH_NAMES[monthIndex]} ${year}`;
                 }
             }
             return val;
         }
 
-        function parseGoogleSheetData(gvizResponse, targetMonth = 'October 2026', isSpecificTab = false) {
+        function parseGoogleSheetData(gvizResponse, targetMonth = 'November 2026', isSpecificTab = false) {
             const table = gvizResponse.table || {};
             const cols = table.cols || [];
             const rawRows = table.rows || [];
@@ -1336,8 +1459,8 @@
 
                 if (normRowMonth) {
                     discoveredMonths.add(normRowMonth);
-                    // Only filter by rowMonth if we are querying the default sheet (not a specific month tab)
-                    if (normTargetMonth && !isSpecificTab) {
+                    // Only filter by rowMonth if the sheet contains multiple different months in the same sheet
+                    if (normTargetMonth && !isSpecificTab && discoveredMonths.size > 1) {
                         const rLow = normRowMonth.toLowerCase();
                         const tLow = normTargetMonth.toLowerCase();
                         if (!rLow.includes(tLow) && !tLow.includes(rLow)) {
@@ -1456,21 +1579,45 @@
             updateCountdownUI();
 
             try {
-                // Try fetching sheet tab for activeMonth first, fallback to default tab
+                // Try fetching sheet tab for activeMonth first
                 let gvizData = null;
                 let isSpecificTab = false;
                 try {
                     gvizData = await fetchGoogleSheet(activeMonth);
-                    if (!gvizData.table || !gvizData.table.rows || gvizData.table.rows.length === 0) {
-                        // If specific tab is empty, try default sheet
+                    if (gvizData && gvizData.table && gvizData.table.rows && gvizData.table.rows.length > 0) {
+                        if (isResponseMatchingMonth(gvizData, activeMonth)) {
+                            isSpecificTab = true;
+                        } else {
+                            // Returned sheet data is a fallback to default sheet (which is for another month)
+                            const detectedMonth = detectMonthFromData(gvizData);
+                            if (detectedMonth) {
+                                activeMonth = detectedMonth;
+                                if (!availableMonths.includes(detectedMonth)) {
+                                    availableMonths.push(detectedMonth);
+                                }
+                                populateMonthDropdown();
+                                isSpecificTab = true;
+                            }
+                        }
+                    } else {
                         gvizData = await fetchGoogleSheet(null);
                         isSpecificTab = false;
-                    } else {
-                        isSpecificTab = true;
                     }
                 } catch (tabErr) {
                     gvizData = await fetchGoogleSheet(null);
                     isSpecificTab = false;
+                }
+
+                if (!isSpecificTab && gvizData && gvizData.table && gvizData.table.rows && gvizData.table.rows.length > 0) {
+                    const detected = detectMonthFromData(gvizData);
+                    if (detected) {
+                        activeMonth = detected;
+                        if (!availableMonths.includes(detected)) {
+                            availableMonths.push(detected);
+                        }
+                        populateMonthDropdown();
+                        isSpecificTab = true;
+                    }
                 }
 
                 const parsed = parseGoogleSheetData(gvizData, activeMonth, isSpecificTab);
@@ -1551,52 +1698,67 @@
         async function discoverSheetTabs() {
             try {
                 const defaultGviz = await fetchGoogleSheet(null);
-                if (!defaultGviz || !defaultGviz.table || !defaultGviz.table.rows) return;
+                if (!defaultGviz || !defaultGviz.table || !defaultGviz.table.rows || defaultGviz.table.rows.length === 0) return;
 
                 const defaultSig = defaultGviz.sig;
-                const defaultRowCount = defaultGviz.table.rows.length;
-                const defaultDay1 = defaultGviz.table.rows[0].c && defaultGviz.table.rows[0].c[1]
-                    ? (defaultGviz.table.rows[0].c[1].f || defaultGviz.table.rows[0].c[1].v) : '';
+                const detectedDefaultMonth = detectMonthFromData(defaultGviz);
 
-                // Candidate months to check in Google Sheet
-                const candidateMonths = [
-                    'October 2026', 'November 2026', 'December 2026',
-                    'January 2027', 'February 2027', 'March 2027',
-                    'April 2027', 'May 2027', 'June 2027',
-                    'Nov. 2026', 'Nov 2026', 'Dec. 2026', 'Dec 2026',
-                    'Oct 2026', 'Oct. 2026'
-                ];
-
-                const existingTabs = ['October 2026'];
-
-                const probePromises = candidateMonths
-                    .filter(c => c !== 'October 2026')
-                    .map(async (sheetName) => {
-                        try {
-                            const res = await fetchGoogleSheet(sheetName);
-                            if (res && res.table && res.table.rows && res.table.rows.length > 0) {
-                                const rRowCount = res.table.rows.length;
-                                const rDay1 = res.table.rows[0].c && res.table.rows[0].c[1]
-                                    ? (res.table.rows[0].c[1].f || res.table.rows[0].c[1].v) : '';
-                                
-                                const isFallback = (res.sig === defaultSig && rRowCount === defaultRowCount && rDay1 === defaultDay1);
-                                if (!isFallback) {
-                                    return sheetName;
-                                }
-                            }
-                        } catch (e) {}
-                        return null;
+                // Candidate months to check in Google Sheet (2026 to 2027)
+                const candidateMonths = [];
+                [2026, 2027].forEach(y => {
+                    ALL_MONTH_NAMES.forEach(m => {
+                        candidateMonths.push(`${m} ${y}`);
                     });
+                });
+
+                const discoveredMap = new Map();
+
+                // 1. Record the default sheet's identified month
+                if (detectedDefaultMonth) {
+                    discoveredMap.set(detectedDefaultMonth, detectedDefaultMonth);
+                } else if (activeMonth) {
+                    discoveredMap.set(activeMonth, activeMonth);
+                }
+
+                // 2. Probe other candidates in parallel to find additional tabs
+                const candidatesToProbe = candidateMonths.filter(c => !discoveredMap.has(c));
+                const probePromises = candidatesToProbe.map(async (sheetName) => {
+                    try {
+                        const res = await fetchGoogleSheet(sheetName);
+                        if (res && res.table && res.table.rows && res.table.rows.length > 0) {
+                            // If sig is different from default, this is a real separate tab in the sheet!
+                            if (res.sig !== defaultSig) {
+                                const exp = getExpectedMonthInfo(sheetName);
+                                return {
+                                    tabName: sheetName,
+                                    canonical: exp ? exp.canonicalName : sheetName
+                                };
+                            }
+                        }
+                    } catch (e) {}
+                    return null;
+                });
 
                 const probeResults = await Promise.all(probePromises);
-                probeResults.forEach(name => {
-                    if (name && !existingTabs.includes(name)) {
-                        existingTabs.push(name);
+                probeResults.forEach(r => {
+                    if (r) {
+                        discoveredMap.set(r.canonical, r.tabName);
                     }
                 });
 
-                availableMonths = existingTabs;
-                populateMonthDropdown();
+                const foundTabs = Array.from(discoveredMap.values());
+                if (foundTabs.length > 0) {
+                    availableMonths = foundTabs;
+                    const curMonth = getCurrentMonthString();
+                    // Always default to current month if user has not manually chosen a different month!
+                    if (!userSelectedMonth && availableMonths.includes(curMonth)) {
+                        activeMonth = curMonth;
+                    } else if (!availableMonths.includes(activeMonth)) {
+                        activeMonth = availableMonths.includes(curMonth) ? curMonth : availableMonths[0];
+                    }
+                    currentSelectedDay = getTodayDate();
+                    populateMonthDropdown();
+                }
 
             } catch (err) {
                 console.warn('Error discovering sheet tabs:', err);
@@ -1606,8 +1768,9 @@
         // Change Month function
         function changeMonth(newMonth) {
             if (newMonth === '__ADD_CUSTOM__') {
-                const customName = prompt("গুগল শিটের নতুন ট্যাবের নাম লিখুন (যেমন: Nov. 2026 বা December 2026):");
+                const customName = prompt("গুগল শিটের নতুন ট্যাবের নাম লিখুন (যেমন: December 2026, January 2027):");
                 if (customName && customName.trim()) {
+                    userSelectedMonth = true;
                     const cleanName = customName.trim();
                     if (!availableMonths.includes(cleanName)) {
                         availableMonths.push(cleanName);
@@ -1623,6 +1786,7 @@
             }
 
             if (!newMonth || newMonth === activeMonth) return;
+            userSelectedMonth = true;
             activeMonth = newMonth;
             currentSelectedDay = getTodayDate();
 
@@ -1636,10 +1800,28 @@
             const selectEl = document.getElementById('sheetMonthSelect');
             if (!selectEl) return;
             selectEl.innerHTML = '';
+
+            // Sort months chronologically
+            availableMonths.sort((a, b) => {
+                const metaA = getMonthMeta(a);
+                const metaB = getMonthMeta(b);
+                return (metaA.year * 12 + metaA.monthIdx) - (metaB.year * 12 + metaB.monthIdx);
+            });
+
+            const curMonth = getCurrentMonthString();
+            // If user hasn't manually picked another month, ensure current month is active!
+            if (!userSelectedMonth && availableMonths.includes(curMonth)) {
+                activeMonth = curMonth;
+            }
+
             availableMonths.forEach(m => {
                 const opt = document.createElement('option');
                 opt.value = m;
-                opt.textContent = m;
+                if (m === curMonth) {
+                    opt.textContent = `${m} (Current)`;
+                } else {
+                    opt.textContent = m;
+                }
                 if (m === activeMonth) opt.selected = true;
                 selectEl.appendChild(opt);
             });

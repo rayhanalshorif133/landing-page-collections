@@ -2,42 +2,53 @@
  * Google Apps Script for Dr. Afroza Supti Duty Roster
  * 
  * ফিচার:
- * ১. Shift কলামে (Col C) 'D', 'N', 'OFF' ড্রপডাউন থাকবে।
- * ২. ড্রপডাউন থেকে 'D', 'N', বা 'OFF' সিলেক্ট করার সাথে সাথেই:
+ * ১. November 2026, December 2026, January 2027, February 2027 - সব মাসের ট্যাব তৈরি বা আপডেট করবে।
+ * ২. প্রতিটি ট্যাবে Shift কলামে (Col C) 'D', 'N', 'OFF' ড্রপডাউন থাকবে।
+ * ৩. ড্রপডাউন থেকে 'D', 'N', বা 'OFF' সিলেক্ট করলেই:
  *    - Shift Name (Col D)
  *    - Time (Col E)
  *    - Notes (Col J)
- *    স্বয়ংক্রিয় ফর্মুলার মাধ্যমে তৎক্ষণাৎ চেঞ্জ হয়ে যাবে!
- * ৩. পুরো রো-এর কালারও অটোমেটিক বদলে যাবে (D = Yellow, N = Blue/Indigo, OFF = Gray)!
+ *    - Day (Col B)
+ *    স্বয়ংক্রিয় ফর্মুলার মাধ্যমে তৎক্ষণাৎ চেঞ্জ হবে!
+ * ৪. পুরো রো-এর কালারও অটোমেটিক বদলে যাবে (D = Yellow, N = Blue/Indigo, OFF = Gray)!
  * 
  * চালানোর নিয়ম:
  * ১. গুগল শিট ওপেন করুন: https://docs.google.com/spreadsheets/d/11i-Zt99U271ty0zHT9OViGeOcZZO5EUXQbU0UrSaTOY/edit
  * ২. Extensions > Apps Script-এ যান।
  * ৩. সব লেখা মুছে দিয়ে এই সম্পূর্ণ কোডটুকু পেস্ট করুন।
- * ৪. উপরে Save (💾) চাপুন এবং "Run" (▶) বাটনে ক্লিক করুন।
+ * ৪. উপরে Save (💾) চাপুন এবং "setupAllMonths" সিলেক্ট করে "Run" (▶) বাটনে চাপ দিন।
  */
 
-function setupDoctorRoster() {
+function setupAllMonths() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getActiveSheet();
-  sheet.setName("October 2026");
-  sheet.clear();
-  sheet.clearConditionalFormatRules();
+  
+  // Setup December 2026 (31 days)
+  setupSingleMonth(ss, "December 2026", 2026, 12, 31);
+  
+  // Setup January 2027 (31 days)
+  setupSingleMonth(ss, "January 2027", 2027, 1, 31);
+  
+  // Setup February 2027 (28 days)
+  setupSingleMonth(ss, "February 2027", 2027, 2, 28);
+  
+  // Make sure November 2026 is properly formatted as well
+  setupSingleMonth(ss, "November 2026", 2026, 11, 30);
+  
+  Logger.log("All months (Nov 2026, Dec 2026, Jan 2027, Feb 2027) successfully created & formatted!");
+}
 
-  // Initial October 2026 shifts
-  var defaultShifts = {
-    1: 'D', 2: 'OFF', 3: 'OFF', 4: 'D', 5: 'N', 6: 'OFF', 7: 'D', 8: 'D',
-    9: 'N', 10: 'OFF', 11: 'OFF', 12: 'D', 13: 'N', 14: 'OFF', 15: 'OFF',
-    16: 'D', 17: 'N', 18: 'OFF', 19: 'D', 20: 'D', 21: 'N', 22: 'OFF',
-    23: 'OFF', 24: 'D', 25: 'N', 26: 'OFF', 27: 'OFF', 28: 'D', 29: 'N',
-    30: 'OFF', 31: 'OFF'
-  };
-
-  // Header row
+function setupSingleMonth(ss, sheetTitle, year, monthNumber, totalDays) {
+  var sheet = ss.getSheetByName(sheetTitle);
+  var isNew = false;
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetTitle);
+    isNew = true;
+  }
+  
+  // Headers
   var headers = [
     "Date", "Day", "Shift", "Shift Name", "Time", "Ward", "Doctor Name", "Staff ID", "Month", "Notes"
   ];
-
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
 
   // Style Header Row
@@ -50,22 +61,29 @@ function setupDoctorRoster() {
   headerRange.setVerticalAlignment("middle");
   sheet.setRowHeight(1, 38);
 
-  // Build 31 rows with dynamic Google Sheets formulas
+  // If new sheet or empty, populate with default rotation
+  var existingLastRow = sheet.getLastRow();
+  var needValues = (isNew || existingLastRow < 2);
+
+  // Default shift rotation: D, N, OFF, OFF, D, D, N...
+  var defaultShifts = ['D', 'N', 'OFF', 'OFF', 'D', 'D', 'N', 'OFF', 'OFF', 'D', 'N', 'OFF'];
+
   var values = [];
-  var formulas = [];
-
-  for (var day = 1; day <= 31; day++) {
+  for (var day = 1; day <= totalDays; day++) {
     var rowNum = day + 1;
-    var initShift = defaultShifts[day];
+    var initShift = defaultShifts[(day - 1) % defaultShifts.length];
 
-    // Automatic formulas:
-    // Day Name calculates from date
-    var dayFormula = '=TEXT(DATE(2026, 10, A' + rowNum + '), "dddd")';
-    // Shift Name automatically changes based on Column C
+    // Read existing shift if already set
+    if (!needValues) {
+      try {
+        var existingVal = sheet.getRange(rowNum, 3).getValue();
+        if (existingVal) initShift = existingVal;
+      } catch (e) {}
+    }
+
+    var dayFormula = '=TEXT(DATE(' + year + ', ' + monthNumber + ', A' + rowNum + '), "dddd")';
     var nameFormula = '=IF(C' + rowNum + '="D", "Day Shift (☀️)", IF(C' + rowNum + '="N", "Night Shift (🌙)", "Off Duty (🏖️)"))';
-    // Time automatically changes based on Column C
     var timeFormula = '=IF(C' + rowNum + '="D", "08:00 - 20:00", IF(C' + rowNum + '="N", "20:00 - 08:00", "-"))';
-    // Notes automatically changes based on Column C
     var notesFormula = '=IF(C' + rowNum + '="D", "12 Hours Day Duty", IF(C' + rowNum + '="N", "12 Hours Overnight Duty", "Rest Day"))';
 
     values.push([
@@ -77,33 +95,32 @@ function setupDoctorRoster() {
       "POW Ward",
       "Dr. Afroza Supti",
       "7269766",
-      "October 2026",
+      sheetTitle,
       notesFormula
     ]);
   }
 
-  // Set values and formulas in sheet
   var dataRange = sheet.getRange(2, 1, values.length, headers.length);
   dataRange.setValues(values);
   dataRange.setFontSize(10);
   dataRange.setVerticalAlignment("middle");
 
   // Alignments
-  sheet.getRange(2, 1, 31, 1).setHorizontalAlignment("center").setFontWeight("bold");
-  sheet.getRange(2, 2, 31, 1).setHorizontalAlignment("center");
-  sheet.getRange(2, 3, 31, 1).setHorizontalAlignment("center").setFontWeight("bold");
-  sheet.getRange(2, 5, 31, 1).setHorizontalAlignment("center");
-  sheet.getRange(2, 8, 31, 2).setHorizontalAlignment("center");
+  sheet.getRange(2, 1, totalDays, 1).setHorizontalAlignment("center").setFontWeight("bold");
+  sheet.getRange(2, 2, totalDays, 1).setHorizontalAlignment("center");
+  sheet.getRange(2, 3, totalDays, 1).setHorizontalAlignment("center").setFontWeight("bold");
+  sheet.getRange(2, 5, totalDays, 1).setHorizontalAlignment("center");
+  sheet.getRange(2, 8, totalDays, 2).setHorizontalAlignment("center");
 
   // Set Dropdown validation on Shift column (Col C)
   var rule = SpreadsheetApp.newDataValidation()
     .requireValueInList(['D', 'N', 'OFF'], true)
     .setAllowInvalid(false)
     .build();
-  sheet.getRange(2, 3, 31, 1).setDataValidation(rule);
+  sheet.getRange(2, 3, totalDays, 1).setDataValidation(rule);
 
   // Set Row Heights
-  for (var r = 2; r <= 32; r++) {
+  for (var r = 2; r <= totalDays + 1; r++) {
     sheet.setRowHeight(r, 28);
   }
 
@@ -113,10 +130,11 @@ function setupDoctorRoster() {
   }
 
   // Set Grid Borders
-  sheet.getRange(1, 1, 32, headers.length).setBorder(true, true, true, true, true, true, "#cbd5e1", SpreadsheetApp.BorderStyle.SOLID);
+  sheet.getRange(1, 1, totalDays + 1, headers.length).setBorder(true, true, true, true, true, true, "#cbd5e1", SpreadsheetApp.BorderStyle.SOLID);
 
   // --- Dynamic Conditional Formatting (Row Colors change automatically) ---
-  var rangeToFormat = sheet.getRange("A2:J32");
+  sheet.clearConditionalFormatRules();
+  var rangeToFormat = sheet.getRange(2, 1, totalDays, headers.length);
   
   // Rule 1: Shift = 'D' (Warm Amber)
   var ruleD = SpreadsheetApp.newConditionalFormatRule()
@@ -143,9 +161,20 @@ function setupDoctorRoster() {
     .build();
 
   sheet.setConditionalFormatRules([ruleD, ruleN, ruleOff]);
-
-  // Freeze Header Row
   sheet.setFrozenRows(1);
 
-  Logger.log("Dr. Supti duty roster setup complete with automatic formulas!");
+  Logger.log(sheetTitle + " setup completed!");
+}
+
+// Quick individual runners:
+function setupDecember() {
+  setupSingleMonth(SpreadsheetApp.getActiveSpreadsheet(), "December 2026", 2026, 12, 31);
+}
+
+function setupJanuary() {
+  setupSingleMonth(SpreadsheetApp.getActiveSpreadsheet(), "January 2027", 2027, 1, 31);
+}
+
+function setupFebruary() {
+  setupSingleMonth(SpreadsheetApp.getActiveSpreadsheet(), "February 2027", 2027, 2, 28);
 }
