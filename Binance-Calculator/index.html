@@ -119,36 +119,70 @@
         <!-- Compact Form Inputs -->
         <form id="calculatorForm" onsubmit="return false;" novalidate class="space-y-3">
             
-            <!-- Investment (Header row with inline quick chips) -->
+            <!-- Investment ($) & Quantity (Qty) - 2-Column synchronized fields -->
             <div class="space-y-1">
-                <div class="flex items-center justify-between">
-                    <label for="investment" class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                        Investment ($)
-                    </label>
-                    <div class="flex items-center gap-1">
-                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="10">$10</button>
-                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="50">$50</button>
-                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="100">$100</button>
-                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="500">$500</button>
+                <div class="flex items-center justify-between pb-0.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                        Order Size
+                    </span>
+                    <div class="flex items-center gap-1 overflow-x-auto">
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60 transition-colors" data-val="50" title="Set $50 investment">$50</button>
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60 transition-colors" data-val="100" title="Set $100 investment">$100</button>
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60 transition-colors" data-val="500" title="Set $500 investment">$500</button>
+                        <span class="text-slate-300 dark:text-slate-700 text-xs">|</span>
+                        <button type="button" class="preset-qty px-1.5 py-0.5 text-[10px] font-mono rounded bg-emerald-500/10 dark:bg-emerald-500/15 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-colors font-semibold" data-qty="100" title="Set 100 Quantity">100 Qty</button>
+                        <button type="button" class="preset-qty px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60 transition-colors" data-qty="1000" title="Set 1,000 Quantity">1k Qty</button>
                     </div>
                 </div>
-                
-                <div class="relative group">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-sm pointer-events-none group-focus-within:text-emerald-500 transition-colors">
-                        $
-                    </span>
-                    <input 
-                        type="number" 
-                        id="investment" 
-                        name="investment"
-                        step="any" 
-                        inputmode="decimal" 
-                        placeholder="0.00" 
-                        class="w-full pl-7 pr-10 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm" 
-                    >
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-[11px] font-semibold text-slate-400 pointer-events-none">
-                        USD
-                    </span>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <!-- Investment ($) -->
+                    <div class="space-y-1">
+                        <label for="investment" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                            Investment ($)
+                        </label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-sm pointer-events-none group-focus-within:text-emerald-500 transition-colors">
+                                $
+                            </span>
+                            <input 
+                                type="number" 
+                                id="investment" 
+                                name="investment"
+                                step="any" 
+                                inputmode="decimal" 
+                                placeholder="0.00" 
+                                class="w-full pl-7 pr-9 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm" 
+                            >
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[10px] font-semibold text-slate-400 pointer-events-none">
+                                USD
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Quantity (Qty) -->
+                    <div class="space-y-1">
+                        <label for="quantity" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                            Quantity (Qty)
+                        </label>
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400 font-bold text-xs pointer-events-none group-focus-within:text-emerald-500 transition-colors">
+                                #
+                            </span>
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                name="quantity"
+                                step="any" 
+                                inputmode="decimal" 
+                                placeholder="0.00" 
+                                class="w-full pl-6 pr-9 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm" 
+                            >
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-2.5 text-[10px] font-semibold text-slate-400 pointer-events-none">
+                                QTY
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -267,9 +301,9 @@
             <!-- Single Row 4-Column Compact Metrics -->
             <div class="grid grid-cols-4 gap-1.5 text-center">
                 
-                <!-- Tokens -->
+                <!-- Tokens / Qty -->
                 <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
-                    <span class="block text-[10px] font-medium text-slate-400 truncate">Tokens</span>
+                    <span class="block text-[10px] font-medium text-slate-400 truncate">Tokens / Qty</span>
                     <span id="tokenCount" class="block font-mono font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm truncate">0.00</span>
                 </div>
 
@@ -356,7 +390,8 @@
             function formatTokens(val) {
                 if (isNaN(val) || val <= 0) return '0.00';
                 let decimals = 2;
-                if (val < 1) decimals = 6;
+                if (val < 0.0001) decimals = 8;
+                else if (val < 1) decimals = 6;
                 else if (val < 100) decimals = 4;
                 return val.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
@@ -364,11 +399,35 @@
                 });
             }
 
+            // Numeric input formatting (avoids scientific notation and strips trailing decimal zeros)
+            function formatNumericInput(val) {
+                if (isNaN(val) || !isFinite(val) || val <= 0) return '';
+                let decimals = 2;
+                if (val < 0.0001) decimals = 8;
+                else if (val < 1) decimals = 6;
+                else if (val < 100) decimals = 4;
+                let str = val.toFixed(decimals);
+                if (str.indexOf('.') !== -1) {
+                    str = str.replace(/\.?0+$/, '');
+                }
+                return str;
+            }
+
+            let lastActiveInput = 'investment'; // 'investment' or 'quantity'
+
             // Calculation Core
             function calculateProfit() {
                 let investment = parseFloat($('#investment').val()) || 0;
+                let quantity = parseFloat($('#quantity').val()) || 0;
                 let buyPrice = parseFloat($('#buyPrice').val()) || 0;
                 let sellPrice = parseFloat($('#sellPrice').val()) || 0;
+
+                // Reconcile investment & quantity if one exists and buyPrice exists
+                if (investment <= 0 && quantity > 0 && buyPrice > 0) {
+                    investment = quantity * buyPrice;
+                } else if (quantity <= 0 && investment > 0 && buyPrice > 0) {
+                    quantity = investment / buyPrice;
+                }
 
                 // Fee determination
                 let feeChoice = $('#exchangeFeeSelect').val();
@@ -385,12 +444,12 @@
                     $('#effectiveFeeDisplay').text((feePercent * 100).toFixed(3).replace(/\.?0+$/, '') + '%');
                 }
 
-                if (investment > 0 && buyPrice > 0) {
+                if ((investment > 0 || quantity > 0) && buyPrice > 0) {
                     let breakeven = buyPrice * (1 + feePercent) / (1 - feePercent);
                     $('#breakevenPriceText').text(formatCurrency(breakeven, 2, 6));
 
                     if (sellPrice > 0) {
-                        let tokens = investment / buyPrice;
+                        let tokens = quantity > 0 ? quantity : (investment / buyPrice);
                         let totalReturn = tokens * sellPrice;
                         let grossProfit = totalReturn - investment;
 
@@ -400,7 +459,7 @@
                         let totalFee = buyFee + sellFee;
 
                         let netProfit = grossProfit - totalFee;
-                        let roi = (netProfit / investment) * 100;
+                        let roi = investment > 0 ? (netProfit / investment) * 100 : 0;
 
                         // UI Updates
                         $('#tokenCount').text(formatTokens(tokens));
@@ -475,13 +534,83 @@
                 $('#trendIcon').html('<circle cx="12" cy="12" r="3" fill="currentColor" />');
             }
 
-            // Input event listeners
-            $('input, select').on('input change', calculateProfit);
+            // Two-way synchronization handlers
+            $('#investment').on('input', function() {
+                lastActiveInput = 'investment';
+                let inv = parseFloat($(this).val());
+                let bp = parseFloat($('#buyPrice').val());
+                if (!isNaN(inv) && inv > 0 && !isNaN(bp) && bp > 0) {
+                    $('#quantity').val(formatNumericInput(inv / bp));
+                } else if ($(this).val() === '') {
+                    $('#quantity').val('');
+                }
+                calculateProfit();
+            });
+
+            $('#quantity').on('input', function() {
+                lastActiveInput = 'quantity';
+                let qty = parseFloat($(this).val());
+                let bp = parseFloat($('#buyPrice').val());
+                if (!isNaN(qty) && qty > 0 && !isNaN(bp) && bp > 0) {
+                    $('#investment').val(formatNumericInput(qty * bp));
+                } else if ($(this).val() === '') {
+                    $('#investment').val('');
+                }
+                calculateProfit();
+            });
+
+            $('#buyPrice').on('input', function() {
+                let bp = parseFloat($(this).val());
+                if (!isNaN(bp) && bp > 0) {
+                    if (lastActiveInput === 'quantity') {
+                        let qty = parseFloat($('#quantity').val());
+                        if (!isNaN(qty) && qty > 0) {
+                            $('#investment').val(formatNumericInput(qty * bp));
+                        } else {
+                            let inv = parseFloat($('#investment').val());
+                            if (!isNaN(inv) && inv > 0) {
+                                $('#quantity').val(formatNumericInput(inv / bp));
+                            }
+                        }
+                    } else {
+                        let inv = parseFloat($('#investment').val());
+                        if (!isNaN(inv) && inv > 0) {
+                            $('#quantity').val(formatNumericInput(inv / bp));
+                        } else {
+                            let qty = parseFloat($('#quantity').val());
+                            if (!isNaN(qty) && qty > 0) {
+                                $('#investment').val(formatNumericInput(qty * bp));
+                            }
+                        }
+                    }
+                }
+                calculateProfit();
+            });
+
+            $('#sellPrice, #exchangeFeeSelect, #customFeeInput').on('input change', calculateProfit);
 
             // Preset Investment Chips
             $('.preset-invest').on('click', function() {
                 const val = $(this).data('val');
-                $('#investment').val(val).trigger('input');
+                lastActiveInput = 'investment';
+                $('#investment').val(val);
+                let bp = parseFloat($('#buyPrice').val());
+                if (!isNaN(bp) && bp > 0) {
+                    $('#quantity').val(formatNumericInput(val / bp));
+                }
+                calculateProfit();
+            });
+
+            // Preset Quantity Chips
+            $('.preset-qty').on('click', function() {
+                const qty = $(this).data('qty');
+                lastActiveInput = 'quantity';
+                $('#quantity').val(qty);
+                let bp = parseFloat($('#buyPrice').val());
+                if (!isNaN(bp) && bp > 0) {
+                    $('#investment').val(formatNumericInput(qty * bp));
+                }
+                calculateProfit();
             });
 
             // Target percentage buttons (+5%, +10%, +25%, +50%, 2x)
@@ -512,32 +641,34 @@
             // Reset button
             $('#btnReset').on('click', function() {
                 $('#investment').val('');
+                $('#quantity').val('');
                 $('#buyPrice').val('');
                 $('#sellPrice').val('');
                 $('#exchangeFeeSelect').val('0.001');
                 $('#customFeeContainer').addClass('hidden');
+                lastActiveInput = 'investment';
                 calculateProfit();
             });
 
             // Copy Summary to clipboard
             $('#btnCopy').on('click', function() {
                 let investment = $('#investment').val() || '0';
+                let tokens = $('#tokenCount').text();
                 let buy = $('#buyPrice').val() || '0';
                 let sell = $('#sellPrice').val() || '0';
                 let net = $('#netProfit').text();
                 let roi = $('#roiValue').text();
-                let tokens = $('#tokenCount').text();
                 let totalReturn = $('#totalReturn').text();
                 let fee = $('#tradingFee').text();
 
-                let summary = `📊 Crypto Trade Calculation Summary:\n` +
+                let summary = `📊 Binance Calculator - Trade Summary:\n` +
                               `• Investment: $${investment}\n` +
+                              `• Quantity: ${tokens} Qty\n` +
                               `• Buy Price: $${buy} | Sell Price: $${sell}\n` +
-                              `• Tokens: ${tokens}\n` +
                               `• Total Return: ${totalReturn}\n` +
                               `• Fees: ${fee}\n` +
                               `• Net Profit: ${net} (${roi})\n` +
-                              `Calculated with Crypto Profit Calculator`;
+                              `Calculated with Binance Calculator`;
 
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(summary).then(showToast);
