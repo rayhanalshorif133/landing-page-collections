@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance Calculator Profit Calculator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        crypto: {
+                            dark: '#0B0F19',
+                            card: '#111827',
+                            border: '#1F2937',
+                            emerald: '#10B981',
+                            rose: '#F43F5E',
+                            cyan: '#06B6D4',
+                            amber: '#F59E0B'
+                        }
+                    },
+                    boxShadow: {
+                        'glow-emerald': '0 0 20px -5px rgba(16, 185, 129, 0.3)',
+                        'glow-rose': '0 0 20px -5px rgba(244, 63, 94, 0.3)',
+                        'glow-card': '0 15px 35px -10px rgba(0, 0, 0, 0.5), 0 0 20px -10px rgba(16, 185, 129, 0.12)',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        /* Custom numeric spinner removal */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .bg-mesh {
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(16, 185, 129, 0.10) 0px, transparent 45%),
+                radial-gradient(at 85% 20%, rgba(6, 182, 212, 0.08) 0px, transparent 45%),
+                radial-gradient(at 50% 85%, rgba(139, 92, 246, 0.06) 0px, transparent 50%);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-crypto-dark text-slate-800 dark:text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 transition-colors duration-300 bg-mesh selection:bg-emerald-500 selection:text-white">
+
+    <!-- Ambient glowing light spots -->
+    <div class="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+    <div class="fixed bottom-10 right-10 w-[280px] h-[280px] bg-cyan-500/10 dark:bg-cyan-500/10 rounded-full blur-[80px] pointer-events-none -z-10"></div>
+
+    <!-- Main Card Container: Compact height & spacing -->
+    <main class="w-full max-w-md bg-white/95 dark:bg-[#111827]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl shadow-xl dark:shadow-glow-card p-4 sm:p-5 transition-all">
+        
+        <!-- Header (Compact) -->
+        <header class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800/80 mb-3.5">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-400 p-0.5 shadow-sm flex items-center justify-center shrink-0">
+                    <div class="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
+                        <svg class="w-4.5 h-4.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="2" x2="12" y2="22"></line>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent leading-tight">
+                        Binance Calculator
+                    </h1>
+                    <div class="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 leading-none">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Live PnL & Fee Estimator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons: Reset & Theme Toggle -->
+            <div class="flex items-center gap-1.5">
+                <button type="button" id="btnReset" title="Reset fields to default" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700/60 text-slate-600 dark:text-slate-300 transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Reset Calculator">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+                <button type="button" id="themeToggle" title="Toggle Theme" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/60 hover:bg-slate-200 dark:hover:bg-slate-700/60 text-slate-600 dark:text-slate-300 transition-all hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" aria-label="Toggle Light / Dark mode">
+                    <svg id="themeIconSun" class="w-3.5 h-3.5 hidden dark:block text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg id="themeIconMoon" class="w-3.5 h-3.5 block dark:hidden text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Compact Form Inputs -->
+        <form id="calculatorForm" onsubmit="return false;" novalidate class="space-y-3">
+            
+            <!-- Investment (Header row with inline quick chips) -->
+            <div class="space-y-1">
+                <div class="flex items-center justify-between">
+                    <label for="investment" class="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                        Investment ($)
+                    </label>
+                    <div class="flex items-center gap-1">
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="10">$10</button>
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="50">$50</button>
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="100">$100</button>
+                        <button type="button" class="preset-invest px-1.5 py-0.5 text-[10px] font-mono rounded bg-slate-100 dark:bg-slate-800 hover:text-emerald-500 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60" data-val="500">$500</button>
+                    </div>
+                </div>
+                
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-sm pointer-events-none group-focus-within:text-emerald-500 transition-colors">
+                        $
+                    </span>
+                    <input 
+                        type="number" 
+                        id="investment" 
+                        name="investment"
+                        step="any" 
+                        inputmode="decimal" 
+                        placeholder="0.00" 
+                        class="w-full pl-7 pr-10 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm" 
+                    >
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-[11px] font-semibold text-slate-400 pointer-events-none">
+                        USD
+                    </span>
+                </div>
+            </div>
+
+            <!-- Buy & Sell Price (2-column side by side) -->
+            <div class="grid grid-cols-2 gap-2.5">
+                
+                <!-- Buy Price -->
+                <div class="space-y-1">
+                    <label for="buyPrice" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                        Buy Price ($)
+                    </label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-sm pointer-events-none group-focus-within:text-emerald-500 transition-colors">
+                            $
+                        </span>
+                        <input 
+                            type="number" 
+                            id="buyPrice" 
+                            name="buyPrice"
+                            step="any" 
+                            inputmode="decimal" 
+                            placeholder="0.00" 
+                            class="w-full pl-7 pr-2.5 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
+                        >
+                    </div>
+                </div>
+
+                <!-- Sell Price -->
+                <div class="space-y-1">
+                    <label for="sellPrice" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                        Sell Price ($)
+                    </label>
+                    <div class="relative group">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 font-bold text-sm pointer-events-none group-focus-within:text-emerald-500 transition-colors">
+                            $
+                        </span>
+                        <input 
+                            type="number" 
+                            id="sellPrice" 
+                            name="sellPrice"
+                            step="any" 
+                            inputmode="decimal" 
+                            placeholder="0.00" 
+                            class="w-full pl-7 pr-2.5 py-2 bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-lg text-slate-900 dark:text-white font-mono text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all shadow-sm"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single Tight Row for Target Multipliers & Breakeven -->
+            <div class="flex items-center justify-between gap-1 pt-0.5">
+                <div class="flex items-center gap-1 overflow-x-auto">
+                    <button type="button" class="target-pct px-2 py-1 text-[11px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all active:scale-95" data-pct="5">+5%</button>
+                    <button type="button" class="target-pct px-2 py-1 text-[11px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all active:scale-95" data-pct="10">+10%</button>
+                    <button type="button" class="target-pct px-2 py-1 text-[11px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all active:scale-95" data-pct="25">+25%</button>
+                    <button type="button" class="target-pct px-2 py-1 text-[11px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all active:scale-95" data-pct="50">+50%</button>
+                    <button type="button" class="target-pct px-2 py-1 text-[11px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all active:scale-95" data-pct="100">2x 🚀</button>
+                </div>
+                <button type="button" id="btnBreakeven" title="Set sell price to cover all fees" class="px-2 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700/60 hover:bg-emerald-500/10 transition-all shrink-0">
+                    🎯 Breakeven
+                </button>
+            </div>
+
+            <!-- Compact Fee Option Row -->
+            <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80 text-xs">
+                <label for="exchangeFeeSelect" class="font-semibold text-slate-500 dark:text-slate-400 text-[11px] shrink-0">
+                    Fee:
+                </label>
+                <div class="flex items-center gap-1.5 flex-1 justify-end">
+                    <select id="exchangeFeeSelect" class="bg-transparent text-right font-medium text-slate-800 dark:text-slate-200 text-xs outline-none cursor-pointer">
+                        <option value="0.001" selected>Binance Spot (0.10%)</option>
+                        <option value="0.00075">Binance + BNB (0.075%)</option>
+                        <option value="0.001">Bybit / OKX (0.10%)</option>
+                        <option value="0.006">Coinbase (0.60%)</option>
+                        <option value="0">Zero Fee (0.00%)</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                    <div id="customFeeContainer" class="hidden w-16 relative">
+                        <input type="number" id="customFeeInput" step="0.01" min="0" value="0.1" class="w-full bg-white dark:bg-slate-800 text-xs border border-slate-300 dark:border-slate-700 rounded px-1.5 py-0.5 font-mono outline-none">
+                        <span class="absolute right-1 top-0.5 text-[10px] text-slate-400">%</span>
+                    </div>
+                    <span id="effectiveFeeDisplay" class="hidden">0.10%</span>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Compact Results Showcase Section -->
+        <section aria-labelledby="resultsHeading" class="mt-3 space-y-2.5">
+            
+            <!-- Compact Hero Result Card: Net Profit & ROI -->
+            <div id="heroResultCard" class="relative overflow-hidden rounded-xl p-3 sm:p-3.5 border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 shadow-md transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <span id="resultsHeading" class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Net Profit (After Fees)
+                    </span>
+                    <span id="roiBadge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-extrabold font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700/60">
+                        <svg id="trendIcon" class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        <span id="roiValue">0.00% ROI</span>
+                    </span>
+                </div>
+
+                <!-- Big Net Profit Number + Breakeven mini pill -->
+                <div class="flex items-baseline justify-between mt-1">
+                    <div id="netProfit" class="text-2xl sm:text-3xl font-extrabold font-mono tracking-tight text-slate-800 dark:text-slate-100 transition-colors">
+                        $0.00
+                    </div>
+                    <div id="breakevenNotice" class="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        BE Price: <strong id="breakevenPriceText" class="text-slate-700 dark:text-slate-200 font-semibold">$0.00</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Single Row 4-Column Compact Metrics -->
+            <div class="grid grid-cols-4 gap-1.5 text-center">
+                
+                <!-- Tokens -->
+                <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
+                    <span class="block text-[10px] font-medium text-slate-400 truncate">Tokens</span>
+                    <span id="tokenCount" class="block font-mono font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm truncate">0.00</span>
+                </div>
+
+                <!-- Return -->
+                <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
+                    <span class="block text-[10px] font-medium text-slate-400 truncate">Return</span>
+                    <span id="totalReturn" class="block font-mono font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm truncate">$0.00</span>
+                </div>
+
+                <!-- Gross Profit -->
+                <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
+                    <span class="block text-[10px] font-medium text-slate-400 truncate">Gross</span>
+                    <span id="grossProfit" class="block font-mono font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm truncate">+$0.00</span>
+                </div>
+
+                <!-- Fee -->
+                <div class="p-2 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-800/80">
+                    <span class="block text-[10px] font-medium text-slate-400 truncate">Total Fee</span>
+                    <span id="tradingFee" class="block font-mono font-bold text-rose-500 text-xs sm:text-sm truncate">-$0.00</span>
+                </div>
+
+            </div>
+
+            <!-- Compact Copy Action Button -->
+            <div class="pt-1">
+                <button type="button" id="btnCopy" class="w-full py-2 px-3 rounded-lg bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+                    <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span id="copyBtnText">Copy Calculation Summary</span>
+                </button>
+            </div>
+
+            <!-- Toast notification for copied text -->
+            <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-slate-900/90 text-white text-xs font-semibold rounded-lg shadow-xl border border-slate-700 backdrop-blur-md flex items-center gap-1.5 opacity-0 pointer-events-none transition-all duration-300 z-50">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Copied to clipboard!</span>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Calculation & Interaction Logic -->
+    <script>
+        $(document).ready(function() {
+            // Theme toggle
+            function initTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'light') {
+                    $('html').removeClass('dark');
+                } else {
+                    $('html').addClass('dark');
+                }
+            }
+            initTheme();
+
+            $('#themeToggle').on('click', function() {
+                $('html').toggleClass('dark');
+                const isDark = $('html').hasClass('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+
+            // Format helper for numbers
+            function formatCurrency(val, minDec = 2, maxDec = 4) {
+                if (isNaN(val)) return '$0.00';
+                const absVal = Math.abs(val);
+                let decimals = 2;
+                if (absVal < 0.01 && absVal > 0) {
+                    decimals = 6;
+                } else if (absVal < 1 && absVal > 0) {
+                    decimals = 4;
+                }
+                decimals = Math.min(Math.max(decimals, minDec), maxDec);
+                return (val < 0 ? '-$' : '$') + Math.abs(val).toLocaleString('en-US', {
+                    minimumFractionDigits: minDec,
+                    maximumFractionDigits: decimals
+                });
+            }
+
+            function formatTokens(val) {
+                if (isNaN(val) || val <= 0) return '0.00';
+                let decimals = 2;
+                if (val < 1) decimals = 6;
+                else if (val < 100) decimals = 4;
+                return val.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: decimals
+                });
+            }
+
+            // Calculation Core
+            function calculateProfit() {
+                let investment = parseFloat($('#investment').val()) || 0;
+                let buyPrice = parseFloat($('#buyPrice').val()) || 0;
+                let sellPrice = parseFloat($('#sellPrice').val()) || 0;
+
+                // Fee determination
+                let feeChoice = $('#exchangeFeeSelect').val();
+                let feePercent = 0.001; // default 0.1%
+
+                if (feeChoice === 'custom') {
+                    $('#customFeeContainer').removeClass('hidden');
+                    let customVal = parseFloat($('#customFeeInput').val()) || 0;
+                    feePercent = customVal / 100;
+                    $('#effectiveFeeDisplay').text(customVal.toFixed(2) + '%');
+                } else {
+                    $('#customFeeContainer').addClass('hidden');
+                    feePercent = parseFloat(feeChoice);
+                    $('#effectiveFeeDisplay').text((feePercent * 100).toFixed(3).replace(/\.?0+$/, '') + '%');
+                }
+
+                if (investment > 0 && buyPrice > 0) {
+                    let breakeven = buyPrice * (1 + feePercent) / (1 - feePercent);
+                    $('#breakevenPriceText').text(formatCurrency(breakeven, 2, 6));
+
+                    if (sellPrice > 0) {
+                        let tokens = investment / buyPrice;
+                        let totalReturn = tokens * sellPrice;
+                        let grossProfit = totalReturn - investment;
+
+                        // Spot Trading fees
+                        let buyFee = investment * feePercent;
+                        let sellFee = totalReturn * feePercent;
+                        let totalFee = buyFee + sellFee;
+
+                        let netProfit = grossProfit - totalFee;
+                        let roi = (netProfit / investment) * 100;
+
+                        // UI Updates
+                        $('#tokenCount').text(formatTokens(tokens));
+                        $('#totalReturn').text(formatCurrency(totalReturn));
+
+                        // Gross Profit formatting
+                        let grossSign = grossProfit >= 0 ? '+' : '';
+                        $('#grossProfit').text(grossSign + formatCurrency(grossProfit).replace('-', ''));
+                        if (grossProfit >= 0) {
+                            $('#grossProfit').removeClass('text-rose-500').addClass('text-emerald-500 dark:text-emerald-400');
+                        } else {
+                            $('#grossProfit').removeClass('text-emerald-500 dark:text-emerald-400').addClass('text-rose-500');
+                        }
+
+                        // Fee formatting
+                        $('#tradingFee').text('-' + formatCurrency(totalFee, 3, 4));
+
+                        // Net Profit formatting
+                        let netSign = netProfit >= 0 ? '+' : '';
+                        $('#netProfit').text(netSign + formatCurrency(netProfit).replace('-', ''));
+
+                        // ROI formatting & badge styling
+                        let roiSign = roi >= 0 ? '+' : '';
+                        $('#roiValue').text(roiSign + roi.toFixed(2) + '% ROI');
+
+                        if (netProfit >= 0) {
+                            $('#netProfit')
+                                .removeClass('text-rose-500 text-slate-800 dark:text-slate-100')
+                                .addClass('text-emerald-600 dark:text-emerald-400');
+                            
+                            $('#heroResultCard')
+                                .removeClass('border-rose-500/30 from-rose-500/10 dark:from-rose-950/40 dark:shadow-glow-rose')
+                                .addClass('border-emerald-500/30 from-emerald-500/10 dark:from-emerald-950/40 dark:shadow-glow-emerald');
+
+                            $('#roiBadge')
+                                .removeClass('bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30')
+                                .addClass('bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30');
+
+                            $('#trendIcon').html('<path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />');
+                        } else {
+                            $('#netProfit')
+                                .removeClass('text-emerald-600 dark:text-emerald-400 text-slate-800 dark:text-slate-100')
+                                .addClass('text-rose-500 dark:text-rose-400');
+
+                            $('#heroResultCard')
+                                .removeClass('border-emerald-500/30 from-emerald-500/10 dark:from-emerald-950/40 dark:shadow-glow-emerald')
+                                .addClass('border-rose-500/30 from-rose-500/10 dark:from-rose-950/40 dark:shadow-glow-rose');
+
+                            $('#roiBadge')
+                                .removeClass('bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30')
+                                .addClass('bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30');
+
+                            $('#trendIcon').html('<path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />');
+                        }
+
+                        return;
+                    }
+                }
+
+                // Reset state when inputs are empty/zero
+                $('#tokenCount').text('0.00');
+                $('#totalReturn, #grossProfit, #tradingFee').text('$0.00');
+                $('#netProfit').text('$0.00').removeClass('text-rose-500 dark:text-rose-400 text-emerald-600 dark:text-emerald-400').addClass('text-slate-800 dark:text-slate-100');
+                $('#roiValue').text('0.00% ROI');
+                $('#breakevenPriceText').text('$0.00');
+                $('#heroResultCard')
+                    .removeClass('border-rose-500/30 from-rose-500/10 dark:from-rose-950/40 dark:shadow-glow-rose border-emerald-500/30 from-emerald-500/10 dark:from-emerald-950/40 dark:shadow-glow-emerald')
+                    .addClass('border-slate-200 dark:border-slate-800');
+                $('#roiBadge')
+                    .removeClass('bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/30 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30')
+                    .addClass('bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700/60');
+                $('#trendIcon').html('<circle cx="12" cy="12" r="3" fill="currentColor" />');
+            }
+
+            // Input event listeners
+            $('input, select').on('input change', calculateProfit);
+
+            // Preset Investment Chips
+            $('.preset-invest').on('click', function() {
+                const val = $(this).data('val');
+                $('#investment').val(val).trigger('input');
+            });
+
+            // Target percentage buttons (+5%, +10%, +25%, +50%, 2x)
+            $('.target-pct').on('click', function() {
+                let buyPrice = parseFloat($('#buyPrice').val()) || 0;
+                if (buyPrice <= 0) return;
+                let pct = parseFloat($(this).data('pct')) || 0;
+                let target = buyPrice * (1 + pct / 100);
+                let decimals = 4;
+                if (buyPrice < 0.01) decimals = 6;
+                else if (buyPrice >= 10) decimals = 2;
+                $('#sellPrice').val(parseFloat(target.toFixed(decimals))).trigger('input');
+            });
+
+            // Set Breakeven button
+            $('#btnBreakeven').on('click', function() {
+                let buyPrice = parseFloat($('#buyPrice').val()) || 0;
+                if (buyPrice <= 0) return;
+                let feeChoice = $('#exchangeFeeSelect').val();
+                let feePercent = feeChoice === 'custom' ? (parseFloat($('#customFeeInput').val()) || 0) / 100 : parseFloat(feeChoice);
+                let breakeven = buyPrice * (1 + feePercent) / (1 - feePercent);
+                let decimals = 4;
+                if (buyPrice < 0.01) decimals = 6;
+                else if (buyPrice >= 10) decimals = 2;
+                $('#sellPrice').val(parseFloat(breakeven.toFixed(decimals))).trigger('input');
+            });
+
+            // Reset button
+            $('#btnReset').on('click', function() {
+                $('#investment').val('');
+                $('#buyPrice').val('');
+                $('#sellPrice').val('');
+                $('#exchangeFeeSelect').val('0.001');
+                $('#customFeeContainer').addClass('hidden');
+                calculateProfit();
+            });
+
+            // Copy Summary to clipboard
+            $('#btnCopy').on('click', function() {
+                let investment = $('#investment').val() || '0';
+                let buy = $('#buyPrice').val() || '0';
+                let sell = $('#sellPrice').val() || '0';
+                let net = $('#netProfit').text();
+                let roi = $('#roiValue').text();
+                let tokens = $('#tokenCount').text();
+                let totalReturn = $('#totalReturn').text();
+                let fee = $('#tradingFee').text();
+
+                let summary = `📊 Crypto Trade Calculation Summary:\n` +
+                              `• Investment: $${investment}\n` +
+                              `• Buy Price: $${buy} | Sell Price: $${sell}\n` +
+                              `• Tokens: ${tokens}\n` +
+                              `• Total Return: ${totalReturn}\n` +
+                              `• Fees: ${fee}\n` +
+                              `• Net Profit: ${net} (${roi})\n` +
+                              `Calculated with Crypto Profit Calculator`;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(summary).then(showToast);
+                } else {
+                    let temp = $('<textarea>');
+                    $('body').append(temp);
+                    temp.val(summary).select();
+                    document.execCommand('copy');
+                    temp.remove();
+                    showToast();
+                }
+            });
+
+            function showToast() {
+                const toast = $('#toast');
+                toast.removeClass('opacity-0 pointer-events-none').addClass('opacity-100');
+                setTimeout(function() {
+                    toast.removeClass('opacity-100').addClass('opacity-0 pointer-events-none');
+                }, 2000);
+            }
+
+            // Initial calculation run
+            calculateProfit();
+        });
+    </script>
+</body>
+</html>
